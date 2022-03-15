@@ -1,0 +1,1 @@
+cmd_/home/root/l2a-01-devicedrivers/sw/accel/l2a01_accel_driver.ko := ld -EL -r  -T /usr/src/3.13.0-00299-ga2e769f/scripts/module-common.lds --build-id  -o /home/root/l2a-01-devicedrivers/sw/accel/l2a01_accel_driver.ko /home/root/l2a-01-devicedrivers/sw/accel/l2a01_accel_driver.o /home/root/l2a-01-devicedrivers/sw/accel/l2a01_accel_driver.mod.o
