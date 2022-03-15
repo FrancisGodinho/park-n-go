@@ -46,6 +46,13 @@ export default function Navigation() {
     return () => clearTimeout(timer as NodeJS.Timeout);
   }, []);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      clearTimeout();
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
+
   // Splash screen while app loading
   if (isLoading)
     screens = (
@@ -72,6 +79,16 @@ export default function Navigation() {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
+          options={screenOptions}
+        />
+      </>
+    );
+  else
+    screens = (
+      <>
+        <Stack.Screen
+          name="Tabs"
+          component={BottomTabNavigator}
           options={screenOptions}
         />
       </>

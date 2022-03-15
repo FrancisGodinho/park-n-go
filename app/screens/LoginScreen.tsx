@@ -5,7 +5,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TextInput,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -13,20 +13,16 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { signInWithEmailAndPassword } from "@firebase/auth";
 
-import { auth } from "../utils/firebase";
+import { auth } from "../utils/Firebase";
 import Headers from "../constants/Headers";
 import Colors from "../constants/Colors";
-import { NavigationProp } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import CustomHeader from "../components/CustomHeader";
 import CustomTextInput from "../components/CustomTextInput";
 import CustomButton from "../components/CustomButton";
 import AuthRedirect from "../components/AuthRedirect";
-import { TabParamList, TabScreenProps } from "../types";
-
-interface Props {
-  navigation: TabScreenProps<Screen extends keyof TabParamList>;
-}
+import { StackParamList } from "../types";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -39,10 +35,12 @@ const errorCodes: object = {
     "There is no existing user record corresponding to the email",
 };
 
-const LoginScreen = ({ navigation }: Props) => {
+const LoginScreen = ({
+  navigation,
+}: NativeStackScreenProps<StackParamList, "Login">) => {
   const [firebaseError, setFirebaseError] = useState({ code: "", message: "" });
 
-  const refPassword = useRef(null);
+  const refPassword = useRef<TextInput>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -68,11 +66,11 @@ const LoginScreen = ({ navigation }: Props) => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
         <SafeAreaView style={styles.imgCont}>
-          <Image source={require("../../assets/icon.png")} style={styles.img} />
+          <FontAwesome5 name="car" size={100} color={Colors.lightBlack} />
         </SafeAreaView>
         <SafeAreaView style={styles.bottomContOuter}>
           <View style={styles.bottomCont}>
-            <CustomHeader backDisabled text="Welcome Back" />
+            <CustomHeader backDisabled={true} text="Welcome Back" />
             <CustomTextInput
               formik={formik}
               icon="envelope"
@@ -80,7 +78,7 @@ const LoginScreen = ({ navigation }: Props) => {
               name="email"
               placeholder="E-mail"
               value={formik.values.email}
-              onSubmitEditing={() => refPassword.current.focus()}
+              onSubmitEditing={() => refPassword.current?.focus()}
             />
             {formik.touched.email && formik.errors.email ? (
               <Text style={[Headers.p, styles.error]}>
@@ -102,11 +100,6 @@ const LoginScreen = ({ navigation }: Props) => {
                 {formik.errors.password}
               </Text>
             ) : null}
-            <TouchableOpacity
-              onPress={() => navigation.navigate("ForgotPassword")}
-            >
-              <Text style={styles.forgotPass}>Forgot password?</Text>
-            </TouchableOpacity>
             <CustomButton
               disabled={!formik.values.email || !formik.values.password}
               style={
@@ -122,7 +115,7 @@ const LoginScreen = ({ navigation }: Props) => {
                 ? errorCodes[firebaseError.code as keyof object]
                 : firebaseError.message}
             </Text>
-            <AuthRedirect toScreen="Register" />
+            <AuthRedirect toScreen="UserRegister" />
           </View>
         </SafeAreaView>
       </View>
@@ -137,8 +130,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.primary,
   },
-  imgCont: { flex: 1 },
-  img: { height: "100%", width: "100%", resizeMode: "contain" },
+  imgCont: { flex: 1, justifyContent: "center", alignItems: "center" },
+  img: {
+    height: "100%",
+    width: "100%",
+    resizeMode: "contain",
+  },
   bottomContOuter: {
     flex: 2,
     borderTopLeftRadius: 15,

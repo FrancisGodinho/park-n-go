@@ -15,6 +15,7 @@ export type StackParamList = {
   UserRegister: undefined;
   AdminRegister: undefined;
   Login: undefined;
+  Tabs: undefined;
 };
 
 export type TabParamList = {
