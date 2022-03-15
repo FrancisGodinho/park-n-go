@@ -1,4 +1,3 @@
-# %%
 from skimage.segmentation import clear_border
 import pytesseract
 import numpy as np
@@ -6,9 +5,10 @@ import imutils
 from imutils import paths
 import cv2
 
-# %%
+from gaussian_blur import gaussian_blur
+
 class ALPR:
-    def __init__(self, minAR=4, maxAR=5, debug=False):
+    def __init__(self, minAR=2, maxAR=5, debug=False):
         # stores min and max aspect ratios for license plates
         # debug determines whether or not to display intermediate results
         self.minAR = minAR
@@ -137,42 +137,71 @@ class ALPR:
         # return OCR'd license plate text and the contour associated with the license plate region
         return (lpText, lpCnt)
 
-# %%
 def cleanup_text(text):
     # strip out non-ASCII text to draw text on image using OpenCV
     return "".join([c if ord(c) < 128 else "" for c in text]).strip()
 
-# %%
-alpr = ALPR()
+alpr = ALPR(debug=False)
 
-imagePaths = sorted(list(paths.list_images("./images/")))
+def get_lp(image):
+    images = [
+        imutils.resize(image, width=600),
+        imutils.resize(image, width=500),
+        imutils.resize(image, width=400),
+        imutils.resize(image, width=300),
+        imutils.resize(image, width=200),
+    ]
 
-# %%
-for imagePath in imagePaths:
-    # Load image and resize
-    image = cv2.imread(imagePath)
-    image = imutils.resize(image, width=600)
-    
-    # Apply automatic license plate recognition
-    (lpText, lpCnt) = alpr.find_and_ocr(image)
-    
-    # only continue if license plate successfully OCR'd
-    if lpText is not None and lpCnt is not None:
-        # fit bounding box to license plate contour and draw bounding box on license plate
-        box = cv2.boxPoints(cv2.minAreaRect(lpCnt))
-        box = box.astype("int")
-        cv2.drawContours(image, [box], -1, (0, 255, 0), 2)
+    for image in images:
+        # Apply automatic license plate recognition
+        (lpText, lpCnt) = alpr.find_and_ocr(image)
         
-        # compute unrotated bounding box for the license plate and draw OCR'd license plate text on the image
-        (x, y, w, h) = cv2.boundingRect(lpCnt)
-        cv2.putText(image, cleanup_text(lpText), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+        # only continue if license plate successfully OCR'd
+        if lpText is not None and lpCnt is not None:
+            # fit bounding box to license plate contour and draw bounding box on license plate
+            box = cv2.boxPoints(cv2.minAreaRect(lpCnt))
+            box = box.astype("int")
+            cv2.drawContours(image, [box], -1, (0, 255, 0), 2)
+            
+            # compute unrotated bounding box for the license plate and draw OCR'd license plate text on the image
+            (x, y, w, h) = cv2.boundingRect(lpCnt)
+            print(x, y, w, h)
+            cv2.putText(image, cleanup_text(lpText), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+            
+            # show the output ANPR image
+            print(lpText)
+            cv2.imshow("Test", image)
+            cv2.waitKey(0)
+        else:
+            print("None")
+
+image = cv2.imread('./images__/1.png')
+get_lp(image)
+
+
+def get_lp_dir(dir="./images/"):
+    imagePaths = sorted(list(paths.list_images(dir)))
+
+    for imagePath in imagePaths:
+        # Load image and resize
+        image = cv2.imread(imagePath)
+        image = imutils.resize(image, width=600)
         
-        # show the output ANPR image
-        print(f"[{imagePath}] {lpText}")
-        cv2.imshow(f"{imagePath}", image)
-        cv2.waitKey(0)
-
-# %%
-
-
-
+        # Apply automatic license plate recognition
+        (lpText, lpCnt) = alpr.find_and_ocr(image)
+        
+        # only continue if license plate successfully OCR'd
+        if lpText is not None and lpCnt is not None:
+            # fit bounding box to license plate contour and draw bounding box on license plate
+            box = cv2.boxPoints(cv2.minAreaRect(lpCnt))
+            box = box.astype("int")
+            cv2.drawContours(image, [box], -1, (0, 255, 0), 2)
+            
+            # compute unrotated bounding box for the license plate and draw OCR'd license plate text on the image
+            (x, y, w, h) = cv2.boundingRect(lpCnt)
+            cv2.putText(image, cleanup_text(lpText), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+            
+            # show the output ANPR image
+            print(f"[{imagePath}] {lpText}")
+            cv2.imshow(f"{imagePath}", image)
+            cv2.waitKey(0)

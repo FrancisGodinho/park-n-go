@@ -6,25 +6,18 @@ import {
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import { Pressable } from "react-native";
 
 import LoginScreen from "../screens/LoginScreen";
 import SplashScreen from "../screens/SplashScreen";
-import TabOneScreen from "../screens/TabOneScreen";
-import TabTwoScreen from "../screens/TabTwoScreen";
 import UserRegisterScreen from "../screens/UserRegisterScreen";
 
 import { useGlobalContext } from "../utils/context";
 import Colors from "../constants/Colors";
-import { RootTabParamList, RootTabScreenProps } from "../types";
+import { StackParamList, TabParamList, TabScreenProps } from "../types";
 import AdminRegisterScreen from "../screens/AdminRegisterScreen";
-
-type StackParamList = {
-  Splash: undefined;
-  UserRegister: undefined;
-  AdminRegister: undefined;
-  Login: undefined;
-};
+import HistoryScreen from "../screens/HistoryScreen";
+import CurrentScreen from "../screens/CurrentScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -97,44 +90,37 @@ export default function Navigation() {
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
  * https://reactnavigation.org/docs/bottom-tab-navigator
  */
-const BottomTab = createBottomTabNavigator<RootTabParamList>();
+const BottomTab = createBottomTabNavigator<TabParamList>();
 
 function BottomTabNavigator() {
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
+      initialRouteName="Current"
       screenOptions={{
         tabBarActiveTintColor: Colors.primary,
       }}
     >
       <BottomTab.Screen
-        name="TabOne"
-        component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<"TabOne">) => ({
-          title: "Tab One",
+        name="History"
+        component={HistoryScreen}
+        options={({ navigation }: TabScreenProps<"History">) => ({
+          title: "History",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate("Modal")}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}
-            >
-              <FontAwesome
-                name="info-circle"
-                size={25}
-                color={Colors.primary}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          ),
         })}
       />
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
+        name="Current"
+        component={CurrentScreen}
         options={{
-          title: "Tab Two",
+          title: "Current",
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          title: "Profile",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />
