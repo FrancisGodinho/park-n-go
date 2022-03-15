@@ -287,34 +287,36 @@ static int camera_open(struct inode *inodep, struct file *filep) {
     return 0;
 }
 
+// TODO
 static ssize_t accel_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
-    data = *buffer;
     unsigned long ret = copy_from_user(virtual_buff0, buffer, len);
     if (ret != 0){printk("UHOH\n");}
-    printk("DATA: %d\n", *buffer);
-    return 1;
+    return len;
 }
 
 static ssize_t camera_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
     int res;
     volatile int i;
     i = 0;
-    //*buffer = data;
-    //unsigned long ret = copy_from_user(virtual_buff0, &virtual_data, 4);
-    //if (ret != 0){printk("UHOH\n");}
-    //printk("virtual buf: %d\n", *((int *) virtual_buff0));
-    iowrite32(physical_buff0, image_writer + ACCEL_ADDR0);
+    iowrite32(physical_buff0+8, image_writer + ACCEL_ADDR0);
+    iowrite32(100, image_writer);
 
-    //while(i < 50000000){i++;}
+    while (i++ < 5000000);
+    
+    res = ioread32(image_writer);
+    res = ioread32(image_writer);
+    printk("start: %d\n", res);
     res = ioread32(image_writer + ACCEL_ADDR0);
     res = ioread32(image_writer + ACCEL_ADDR0);
-    res = ioread32(image_writer + ACCEL_ADDR0);
-    //int error = copy_to_user(buffer, virtual_buff0, 4);
-    //if (error != 0){printk("UHOH %d\n", error);}
-    //printk("HELLO %d\n", buffer[0]);
-    printk("HELLO2 %d\n", res);
-    //printk("HELLO3 %p\n", physical_buff0);
-    return 1;
+    printk("Res addr0: %d\n", res);
+    printk("physical: %d\n", physical_buff0);
+    res = ioread32(image_writer + ACCEL_ADDR1);
+    res = ioread32(image_writer + ACCEL_ADDR1);
+    printk("Res addr1: %d\n", res);
+     
+    memcpy(buffer, &res, sizeof(res)); 
+   
+    return len;
 }
 
 static int camera_release(struct inode *inodep, struct file *filep) {

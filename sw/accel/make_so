@@ -1,0 +1,2 @@
+gcc -c -fPIC unit_test.cpp -o unit_test.o
+gcc unit_test.o -shared -o unit_test.so
