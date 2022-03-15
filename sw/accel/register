@@ -1,0 +1,5 @@
+rmmod l2a01_accel_driver.ko
+make clean
+make all
+insmod l2a01_accel_driver.ko
+
