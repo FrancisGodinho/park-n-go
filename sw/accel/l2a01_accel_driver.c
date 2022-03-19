@@ -339,7 +339,7 @@ static ssize_t camera_read(struct file *filep, char *buffer, size_t len, loff_t 
     //iowrite32(0, image_writer + ACCEL_START);
     
     //memcpy(buffer, &res, sizeof(res)); 
-   
+  	*buffer = res; 
     return len;
 }
 
