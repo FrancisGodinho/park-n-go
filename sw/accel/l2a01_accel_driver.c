@@ -216,7 +216,7 @@ static int camera_open(struct inode *inodep, struct file *filep) {
     }
 
     // Calculate required memory to store an Image
-    image_memory_size = image_width * image_height * pixel_size;
+    image_memory_size = 64; //image_width * image_height * pixel_size;
 
     // Allocate uncached buffers
     // The dma_alloc_coherent() function allocates non-cached physically
@@ -226,7 +226,7 @@ static int camera_open(struct inode *inodep, struct file *filep) {
     printk("dma alloc\n");
     virtual_buff0 = dma_alloc_coherent(
         NULL,
-        /*image_memory_size*/ 64,
+        image_memory_size,
         &(physical_buff0), //address to use from image writer in fpga
         GFP_KERNEL);
 
@@ -264,9 +264,7 @@ static int camera_open(struct inode *inodep, struct file *filep) {
     ////In continuous mode start the capture of images into buff0 and buff1
 
     ////Stop the capture (to ensure a known state)
-    //iowrite32(0, image_writer + START_CAPTURE);
-
-    //// Wait until Standby signal is 1. Its the way to ensure that the component
+    //iowrite32(0, image_writer + START_CAPTURE); 480    //// Wait until Standby signal is 1. Its the way to ensure that the component
     //// is not in reset or acquiring a signal.
     //counter = 10000000;
     //while((!(ioread32(image_writer + CAPTURE_STANDBY))) && (counter>0)) {
@@ -289,8 +287,15 @@ static int camera_open(struct inode *inodep, struct file *filep) {
 
 // TODO
 static ssize_t accel_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
-    unsigned long ret = copy_from_user(virtual_buff0, buffer, len);
-    if (ret != 0){printk("UHOH\n");}
+    int i;
+    unsigned long ret = copy_from_user(virtual_buff0, buffer, len/2);
+    if (ret != 0){printk("UHOH1\n");}
+    ret = copy_from_user(virtual_buff1, buffer+len/2, len/2);
+    if (ret != 0){printk("UHOH2\n");}
+    for (i = 0; i < len; i++) {
+        printk("%d ", *(buffer + i));
+    }
+    printk("\n");
     return len;
 }
 
@@ -298,23 +303,42 @@ static ssize_t camera_read(struct file *filep, char *buffer, size_t len, loff_t 
     int res;
     volatile int i;
     i = 0;
-    iowrite32(physical_buff0+8, image_writer + ACCEL_ADDR0);
-    iowrite32(100, image_writer);
+
+    unsigned long err;
+    err = copy_to_user(buffer, virtual_buff0, 1);
+    if (err) {printk("UHOH\n");}
+    printk("%d\n", *buffer);
+
+    iowrite32(physical_buff0, image_writer + ACCEL_ADDR0);
+    iowrite32(physical_buff1, image_writer + ACCEL_ADDR1);
+    iowrite32(len, image_writer + ACCEL_N);
 
     while (i++ < 5000000);
-    
-    res = ioread32(image_writer);
-    res = ioread32(image_writer);
-    printk("start: %d\n", res);
+
     res = ioread32(image_writer + ACCEL_ADDR0);
     res = ioread32(image_writer + ACCEL_ADDR0);
     printk("Res addr0: %d\n", res);
-    printk("physical: %d\n", physical_buff0);
+    printk("physical_0: %d\n", physical_buff0);
+    
     res = ioread32(image_writer + ACCEL_ADDR1);
     res = ioread32(image_writer + ACCEL_ADDR1);
     printk("Res addr1: %d\n", res);
+    printk("physical_1: %d\n", physical_buff1);
+    
+    res = ioread32(image_writer + ACCEL_N);
+    res = ioread32(image_writer + ACCEL_N);
+    printk("N val: %d\n", res);
      
-    memcpy(buffer, &res, sizeof(res)); 
+    //iowrite32(1, image_writer + ACCEL_START);
+
+    res = ioread32(image_writer + ACCEL_SUM);
+    printk("sum: %d\n", res);
+    res = ioread32(image_writer + ACCEL_SUM);
+    printk("sum: %d\n", res);
+    
+    //iowrite32(0, image_writer + ACCEL_START);
+    
+    //memcpy(buffer, &res, sizeof(res)); 
    
     return len;
 }
@@ -325,7 +349,7 @@ static int camera_release(struct inode *inodep, struct file *filep) {
     int dev_number = iminor(filep->f_path.dentry->d_inode);
 
     if (dev_number == MINOR_RGBG) {
-        printk(KERN_INFO DRIVER_NAME": Release RGBG\n");
+        printk(KERN_INFO DRIVER_NAME": Release ACCEL\n");
     }
 
     if (is_open == 0) {
@@ -334,7 +358,7 @@ static int camera_release(struct inode *inodep, struct file *filep) {
     }
 
 
-    dma_free_coherent(NULL, /*image_memory_size*/64, virtual_buff0,
+    dma_free_coherent(NULL, image_memory_size, virtual_buff0,
       physical_buff0);
     dma_free_coherent(NULL, image_memory_size, virtual_buff1,
       physical_buff1);

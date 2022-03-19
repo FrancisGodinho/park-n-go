@@ -4,6 +4,8 @@
 #define ACCEL_START 0x0
 #define ACCEL_ADDR0 0x4
 #define ACCEL_ADDR1 0x8
+#define ACCEL_N     0xC
+#define ACCEL_SUM   0x10
 
 #define HPS_FPGA_BRIDGE_BASE 0xC0000000
 #define DRIVER_NAME "cpen391_accel"
