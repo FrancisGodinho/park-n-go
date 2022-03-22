@@ -3,16 +3,11 @@
 #include <string> 
 #include <vector>
 
-//#define DEBUG_PRINT
-#define PRINT_BLUR_RESULT
+#include "./accel.h"
+
 using namespace std;
 	
-// set constants
-const int img_height = 3;
-const int img_width = 4;
-const int win_len = 2;
-
-static int setup_arr(int* a1, int* a2, char* o, int n) {
+int setup_arr(vector<int>& a1, int* a2, char* o, int n) {
 	// expands, and concateates a1 and a2
 	// expanding: [1, 2, 3] -> [1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0]
     int i;
@@ -36,7 +31,7 @@ static int setup_arr(int* a1, int* a2, char* o, int n) {
     return 0;
 }
 
-static void g_blur(int (*img)[img_width], int (*out)[img_width - win_len + 1], int* win){	
+void g_blur(vector<vector<int>>& img, vector<vector<int>>& out, vector<int> win){	
 	int i, j;
 	int p, q;
 	char res[4];
@@ -71,7 +66,9 @@ static void g_blur(int (*img)[img_width], int (*out)[img_width - win_len + 1], i
 #endif
 			accel.write(o, 8 * win_len * win_len); // write to 1gb dram
      		accel.read(res, win_len); // read result of hw accleration
-
+#ifdef DEBUG_PRINT
+			cout << "result of dot product is " << (int)res[0] << endl;
+#endif
 			out[i][j] = res[0]; // write the result to out array
      		accel.close(); // close the kernel module
 		}
@@ -79,13 +76,13 @@ static void g_blur(int (*img)[img_width], int (*out)[img_width - win_len + 1], i
 }
 
 
-int main () {
+int test () {
     fstream accel;
 
 	// test blur
-	int img[img_height][img_width] = {{1, 2, 3, 5}, {4, 5, 6, 10}, {7, 8, 9, 15}};
-	int window[win_len * win_len] = {1, 2, 3, 4};
-	int out[img_height - win_len + 1][img_width - win_len + 1];
+	vector<vector<int>> img = {{1, 2, 3, 5}, {4, 5, 6, 10}, {7, 8, 9, 15}};
+	vector<int> window = {1, 2, 3, 4};
+	vector<vector<int>> out(img_height - win_len + 1, vector<int>(img_width - win_len + 1));
 	g_blur(img, out, window);
 
 #if defined(DEBUG_PRINT) || defined(PRINT_BLUR_RESULT)
