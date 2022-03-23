@@ -79,6 +79,7 @@ async def create_upload_file(file: UploadFile = File(...)):
     raw_array = raw_array.reshape((480, 640, 4))
     image = raw_array[:, :, 0:3]
     imageio.imwrite("img.png", image)
+    image = cv2.imread('img.png')
     image = imutils.resize(image, width=200)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     alpr.gray = gray
