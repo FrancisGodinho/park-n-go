@@ -5,6 +5,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TextInput,
+  View,
+  TouchableOpacity,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import {
@@ -22,12 +24,15 @@ import CustomTextInput from "../components/CustomTextInput";
 import Colors from "../constants/Colors";
 import CustomButton from "../components/CustomButton";
 import AuthRedirect from "../components/AuthRedirect";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { StackParamList } from "../types";
 
 type Props = {};
 
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required("Required"),
   email: Yup.string().email("Invalid email").required("Required"),
+  plate: Yup.string().required("Required"),
   password: Yup.string()
     .min(6, "Must be 6 characters or more")
     .required("Required"),
@@ -40,10 +45,13 @@ const errorCodes: object = {
   "auth/invalid-email": "Invalid email",
 };
 
-const UserRegisterScreen = () => {
+const UserRegisterScreen = ({
+  navigation,
+}: NativeStackScreenProps<StackParamList, "UserRegister">) => {
   const [firebaseError, setFirebaseError] = useState({ code: "", message: "" });
 
   const refEmail = useRef<TextInput>();
+  const refPlate = useRef<TextInput>();
   const refPassword = useRef<TextInput>();
   const refConfirmPassword = useRef<TextInput>();
 
@@ -51,6 +59,7 @@ const UserRegisterScreen = () => {
     initialValues: {
       name: "",
       email: "",
+      plate: "",
       password: "",
       confirmPassword: "",
     },
@@ -65,10 +74,12 @@ const UserRegisterScreen = () => {
   const signUp = async ({
     name,
     email,
+    plate,
     password,
   }: {
     name: string;
     email: string;
+    plate: string;
     password: string;
   }) => {
     createUserWithEmailAndPassword(auth, email, password)
@@ -77,7 +88,8 @@ const UserRegisterScreen = () => {
         setDoc(doc(db, "users", cred.user.uid), {
           dateCreated: Timestamp.fromDate(new Date()),
           displayName: name,
-          streak: 0,
+          isParking: false,
+          licensePlate: plate,
         });
       })
       .catch((err) => setFirebaseError(err));
@@ -106,6 +118,18 @@ const UserRegisterScreen = () => {
           placeholder="E-mail"
           refValue={refEmail}
           value={formik.values.email}
+          onSubmitEditing={() => refPlate.current?.focus()}
+        />
+        {formik.touched.email && formik.errors.email ? (
+          <Text style={[Headers.p, styles.error]}>{formik.errors.email}</Text>
+        ) : null}
+        <CustomTextInput
+          formik={formik}
+          icon="car"
+          name="plate"
+          placeholder="License Plate"
+          refValue={refPlate}
+          value={formik.values.plate}
           onSubmitEditing={() => refPassword.current?.focus()}
         />
         {formik.touched.email && formik.errors.email ? (
@@ -141,24 +165,47 @@ const UserRegisterScreen = () => {
             {formik.errors.confirmPassword}
           </Text>
         ) : null}
-        <CustomButton
-          disabled={
-            !formik.values.name ||
-            !formik.values.email ||
-            !formik.values.password ||
-            !formik.values.confirmPassword
-          }
-          style={
-            !formik.values.name ||
-            !formik.values.email ||
-            !formik.values.password ||
-            !formik.values.confirmPassword
-              ? { backgroundColor: Colors.lightGray }
-              : null
-          }
-          text="Register"
-          onPress={formik.handleSubmit}
-        />
+        <View style={styles.bottom}>
+          <View style={styles.admin}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AdminRegister")}
+            >
+              <Text
+                style={[
+                  Headers.p,
+                  {
+                    color: Colors.primary,
+                    fontSize: 15,
+                  },
+                ]}
+              >
+                Register
+              </Text>
+            </TouchableOpacity>
+            <Text
+              style={[
+                Headers.p,
+                {
+                  fontSize: 15,
+                },
+              ]}
+            >
+              {" "}
+              as an admin
+            </Text>
+          </View>
+
+          <CustomButton
+            disabled={
+              !formik.values.name ||
+              !formik.values.email ||
+              !formik.values.password ||
+              !formik.values.confirmPassword
+            }
+            text="Register"
+            onPress={formik.handleSubmit}
+          />
+        </View>
         <Text style={[Headers.p, styles.error]}>
           {Object.keys(errorCodes).includes(firebaseError.code)
             ? errorCodes[firebaseError.code as keyof object]
@@ -175,6 +222,8 @@ export default UserRegisterScreen;
 const styles = StyleSheet.create({
   container: { flex: 1, marginHorizontal: 10 },
   h1: { marginTop: 20, marginBottom: 10 },
+  bottom: { marginTop: "auto" },
+  admin: { flexDirection: "row", justifyContent: "center", marginBottom: 30 },
   error: {
     color: "red",
     marginLeft: 10,

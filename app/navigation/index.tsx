@@ -1,6 +1,6 @@
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
@@ -21,6 +21,11 @@ import ProfileScreen from "../screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
+const MyTheme = {
+  ...DefaultTheme,
+  colors: { ...DefaultTheme.colors, background: Colors.black },
+};
+
 export default function Navigation() {
   const [isLoading, setIsLoading] = useState(true);
   const [timer, setTimer] = useState<NodeJS.Timeout>();
@@ -33,22 +38,25 @@ export default function Navigation() {
     contentStyle: { backgroundColor: Colors.lightBlack },
     headerShown: false,
   };
+
   const screenOptions: NativeStackNavigationOptions = {
     animation: "none",
   };
 
   useEffect(() => {
-    const timeout: NodeJS.Timeout = setTimeout(() => {
-      setIsAuthenticated(false);
-      setIsLoading(false);
-    }, 5000);
-    setTimer(timeout);
-    return () => clearTimeout(timer as NodeJS.Timeout);
-  }, []);
+    if (!isAuthenticated) {
+      const timeout: NodeJS.Timeout = setTimeout(() => {
+        setIsAuthenticated(false);
+        setIsLoading(false);
+      }, 5000);
+      setTimer(timeout);
+      return () => clearTimeout(timer as NodeJS.Timeout);
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (isAuthenticated) {
-      clearTimeout();
+      clearTimeout(timer as NodeJS.Timeout);
       setIsLoading(false);
     }
   }, [isAuthenticated]);
@@ -95,7 +103,7 @@ export default function Navigation() {
     );
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={MyTheme}>
       <Stack.Navigator screenOptions={navigatorOptions}>
         {screens}
       </Stack.Navigator>
@@ -115,30 +123,36 @@ function BottomTabNavigator() {
       initialRouteName="Current"
       screenOptions={{
         tabBarActiveTintColor: Colors.primary,
+        tabBarShowLabel: false,
+        headerShown: false,
+        tabBarStyle: { backgroundColor: Colors.lightBlack, borderTopWidth: 0 },
       }}
     >
       <BottomTab.Screen
         name="History"
         component={HistoryScreen}
         options={({ navigation }: TabScreenProps<"History">) => ({
-          title: "History",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 name="book-open" color={color} solid size={25} />
+          ),
         })}
       />
       <BottomTab.Screen
         name="Current"
         component={CurrentScreen}
         options={{
-          title: "Current",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 name="car" color={color} solid size={25} />
+          ),
         }}
       />
       <BottomTab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
-          title: "Profile",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 name="user" color={color} solid size={25} />
+          ),
         }}
       />
     </BottomTab.Navigator>
@@ -149,8 +163,8 @@ function BottomTabNavigator() {
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
  */
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
+  name: React.ComponentProps<typeof FontAwesome5>["name"];
   color: string;
 }) {
-  return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome5 size={30} style={{ marginBottom: -3 }} {...props} />;
 }

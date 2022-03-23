@@ -3,28 +3,30 @@ import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import Headers from "../constants/Headers";
 import Colors from "../constants/Colors";
+import { RootStackParamList } from "../types";
 
 interface Props {
   toScreen: string;
 }
 
-type StackParamList = {
-  Splash: undefined;
-  UserRegister: undefined;
-  AdminRegister: undefined;
-  Login: undefined;
-};
-
 const AuthRedirect = ({ toScreen }: Props) => {
   const navigation = useNavigation();
+
+  const toScreenText: object = { UserRegister: "Register", Login: "Login" };
 
   return (
     <View style={styles.container}>
       <Text style={[Headers.p, styles.text1]}>
         {toScreen === "Login" ? "Already" : "Don't"} have an account?{" "}
       </Text>
-      <TouchableOpacity onPress={() => navigation.navigate(toScreen)}>
-        <Text style={[Headers.p, styles.text2]}>{toScreen}</Text>
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate(toScreen as keyof RootStackParamList)
+        }
+      >
+        <Text style={[Headers.p, styles.text2]}>
+          {toScreenText[toScreen as keyof object]}
+        </Text>
       </TouchableOpacity>
     </View>
   );

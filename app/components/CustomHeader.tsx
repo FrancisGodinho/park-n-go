@@ -22,7 +22,7 @@ const CustomHeader = ({ backDisabled, text }: Props) => {
         <FontAwesome5
           name="chevron-left"
           size={24}
-          color={backDisabled ? Colors.lightBlack : "black"}
+          color={backDisabled ? Colors.black : "black"}
         />
       </TouchableOpacity>
       <Text style={[Headers.h1, { maxWidth: "90%" }]}>{text}</Text>

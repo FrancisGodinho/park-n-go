@@ -5,7 +5,7 @@ import { auth } from "../utils/Firebase";
 
 type Props = {};
 
-const Settings = (props: Props) => {
+const Settings = () => {
   const handleSignOut = () => {
     signOut(auth).catch((err) => console.error(err));
   };

@@ -8,17 +8,33 @@ import React, {
   useState,
 } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "./Firebase";
 
 type ContextState = {
   isAuthenticated: boolean;
   setIsAuthenticated: Dispatch<SetStateAction<boolean>>;
+  isParking: boolean;
+  setIsParking: Dispatch<SetStateAction<boolean>>;
+  startTime: Date;
+  setStartTime: Dispatch<SetStateAction<Date>>;
+  lotId: string;
+  setLotId: Dispatch<SetStateAction<string>>;
+  lotName: string;
+  setLotName: Dispatch<SetStateAction<string>>;
 };
 
 const defaultValues: ContextState = {
   isAuthenticated: false,
   setIsAuthenticated: () => {},
+  isParking: false,
+  setIsParking: () => {},
+  startTime: new Date(),
+  setStartTime: () => {},
+  lotId: "",
+  setLotId: () => {},
+  lotName: "",
+  setLotName: () => {},
 };
 
 const AppContext = createContext<ContextState>(defaultValues);
@@ -27,6 +43,10 @@ const AppProvider: FC = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     defaultValues.isAuthenticated
   );
+  const [isParking, setIsParking] = useState<boolean>(defaultValues.isParking);
+  const [startTime, setStartTime] = useState<Date>(defaultValues.startTime);
+  const [lotId, setLotId] = useState<string>(defaultValues.lotId);
+  const [lotName, setLotName] = useState<string>(defaultValues.lotName);
 
   // Keep track of current user
   useEffect(() => {
@@ -46,8 +66,34 @@ const AppProvider: FC = ({ children }) => {
     return unsubscribeAuth;
   }, []);
 
+  // Keep track of updates to userDoc (mainly to update isParking)
+  useEffect(() => {
+    let unsub;
+    if (auth.currentUser) {
+      unsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
+        setIsParking(doc.data()?.isParking);
+        setStartTime(doc.data()?.startTime);
+        setLotId(doc.data()?.lotId);
+      });
+    }
+    return unsub;
+  }, [auth.currentUser]);
+
   return (
-    <AppContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+    <AppContext.Provider
+      value={{
+        isAuthenticated,
+        setIsAuthenticated,
+        isParking,
+        setIsParking,
+        startTime,
+        setStartTime,
+        lotId,
+        setLotId,
+        lotName,
+        setLotName,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );
