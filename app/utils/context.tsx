@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, Timestamp } from "firebase/firestore";
 import { auth, db } from "./Firebase";
 
 type ContextState = {
@@ -16,8 +16,8 @@ type ContextState = {
   setIsAuthenticated: Dispatch<SetStateAction<boolean>>;
   isParking: boolean;
   setIsParking: Dispatch<SetStateAction<boolean>>;
-  startTime: Date;
-  setStartTime: Dispatch<SetStateAction<Date>>;
+  startTime: Timestamp;
+  setStartTime: Dispatch<SetStateAction<Timestamp>>;
   lotId: string;
   setLotId: Dispatch<SetStateAction<string>>;
   lotName: string;
@@ -29,7 +29,7 @@ const defaultValues: ContextState = {
   setIsAuthenticated: () => {},
   isParking: false,
   setIsParking: () => {},
-  startTime: new Date(),
+  startTime: Timestamp.now(),
   setStartTime: () => {},
   lotId: "",
   setLotId: () => {},
@@ -44,7 +44,9 @@ const AppProvider: FC = ({ children }) => {
     defaultValues.isAuthenticated
   );
   const [isParking, setIsParking] = useState<boolean>(defaultValues.isParking);
-  const [startTime, setStartTime] = useState<Date>(defaultValues.startTime);
+  const [startTime, setStartTime] = useState<Timestamp>(
+    defaultValues.startTime
+  );
   const [lotId, setLotId] = useState<string>(defaultValues.lotId);
   const [lotName, setLotName] = useState<string>(defaultValues.lotName);
 
