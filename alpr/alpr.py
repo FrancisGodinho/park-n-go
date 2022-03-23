@@ -151,7 +151,6 @@ def cleanup_text(text):
 
 def main():
     image = cv2.imread('images__/3.png')
-    print(image)
     image = imutils.resize(image, width=200)
 
     alpr = ALPR(debug=False)
@@ -175,9 +174,6 @@ def main():
     # return OCR'd license plate text and the contour associated with the license plate region
     return (lpText, lpCnt)
 
-if __name__ == '__main__':
-    main()
-
 # def get_lp(image):
 #     image = imutils.resize(image, width=300),
 #     # Apply automatic license plate recognition
@@ -192,7 +188,6 @@ if __name__ == '__main__':
         
 #         # compute unrotated bounding box for the license plate and draw OCR'd license plate text on the image
 #         (x, y, w, h) = cv2.boundingRect(lpCnt)
-#         print(x, y, w, h)
 #         cv2.putText(image, cleanup_text(lpText), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
         
 #         # show the output ANPR image

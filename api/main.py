@@ -21,6 +21,7 @@ import imutils
 sys.path.append("..")
 from alpr.alpr import ALPR
 import pytesseract
+import ast
 
 app = FastAPI()
 
@@ -50,6 +51,12 @@ app.add_middleware(
 
 alpr = ALPR(debug=False)
 
+def string_to_numpy(str):
+    str = str.replace('<', '[').replace('>', ']')
+    lst = ast.literal_eval(str)
+    arr = np.array(lst, dtype='float64')
+    return arr
+
 @app.get("/test")
 async def Test():
     return "testing value"
@@ -70,12 +77,14 @@ async def create_upload_file(file: UploadFile = File(...)):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     alpr.gray = gray
     res = alpr.get_gauss_image()
-    return res
+    return res.tolist()
 
 @app.post("/accel_result")
 async def acceleration_result(input):
-    input /= 273
-    candidates = alpr.locate_license_plate_candidates(input)
+    image = string_to_numpy(input)
+    # image /= 273
+    image = image.astype('uint8')
+    candidates = alpr.locate_license_plate_candidates(image)
     (lp, lpCnt) = alpr.locate_license_plate(candidates, clearBorder=False)
     # only OCR the license plate if the license plate ROI is not empty
     if lp is not None:
