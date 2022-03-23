@@ -51,7 +51,11 @@ app.add_middleware(
 
 alpr = ALPR(debug=False)
 
+def string_to_numpy2(content):
+    return 0
+
 def string_to_numpy(str):
+    print(str)
     str = str.replace('<', '[').replace('>', ']')
     lst = ast.literal_eval(str)
     arr = np.array(lst, dtype='float64')
@@ -70,9 +74,11 @@ async def TestPost(val: int = 0):
 async def create_upload_file(file: UploadFile = File(...)):
     content = await file.read()  # async read
     print(len(content))
+
     raw_array = np.fromstring(content, dtype=np.uint8)
     raw_array = raw_array.reshape((480, 640, 4))
     image = raw_array[:, :, 0:3]
+    imageio.imwrite("img.png", image)
     image = imutils.resize(image, width=200)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     alpr.gray = gray
@@ -80,8 +86,14 @@ async def create_upload_file(file: UploadFile = File(...)):
     return res.tolist()
 
 @app.post("/accel_result")
-async def acceleration_result(input):
-    image = string_to_numpy(input)
+async def acceleration_result(file: UploadFile = File(...)):
+    lpText = None
+    content = await file.read()
+    #print(content)
+    print(type(content))
+    image = str(content)[2:-1]
+    print(image[0])
+    image =  string_to_numpy(image)
     image /= 273
     image = image.astype('uint8')
     candidates = alpr.locate_license_plate_candidates(image)
