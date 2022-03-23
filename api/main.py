@@ -82,7 +82,7 @@ async def create_upload_file(file: UploadFile = File(...)):
 @app.post("/accel_result")
 async def acceleration_result(input):
     image = string_to_numpy(input)
-    # image /= 273
+    image /= 273
     image = image.astype('uint8')
     candidates = alpr.locate_license_plate_candidates(image)
     (lp, lpCnt) = alpr.locate_license_plate(candidates, clearBorder=False)
