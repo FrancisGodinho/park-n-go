@@ -5,3 +5,5 @@ venv*
 test.py
 
 cpen-391-ab53e-4274a32d414e.json
+
+__pycache__*

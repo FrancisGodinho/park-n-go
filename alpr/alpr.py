@@ -52,6 +52,7 @@ class ALPR:
                 
     def locate_license_plate_candidates(self, gradX, keep=5):
         gradX = self.gauss
+        print(gradX)
         rectKern = cv2.getStructuringElement(cv2.MORPH_RECT, (13, 5))
         # blur the gradient representation, applying a closing operation,
         # and threshold the image using Otsu's method
