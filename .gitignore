@@ -1,1 +1,10 @@
 *.DS_Store
+*.ko
+*.o
+*.swp
+*.mod*
+*.order*
+*.cmd
+*.symvers
+sw/server/image
+
