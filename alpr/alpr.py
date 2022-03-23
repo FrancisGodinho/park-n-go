@@ -119,10 +119,10 @@ class ALPR:
         
         return options
 
-    def get_gauss_image(self, image):
+    def get_gauss_image(self):
         # convert image to grayscale, locate all potential licesne plate locations, 
         # process the candidates and return actual license plate
-        gauss_image, light = self.image_processing_gauss(image)
+        gauss_image, light = self.image_processing_gauss(self.gray)
         return gauss_image, light
                 
     # def find_and_ocr(self, image, psm=7, clearBorder=False):
