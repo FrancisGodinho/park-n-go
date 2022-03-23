@@ -288,6 +288,7 @@ static int camera_open(struct inode *inodep, struct file *filep) {
 // TODO
 static ssize_t accel_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
     int i;
+	printk("camera write: len is %d\n", len);
     unsigned long ret = copy_from_user(virtual_buff0, buffer, len/2);
     if (ret != 0){printk("UHOH1\n");}
     ret = copy_from_user(virtual_buff1, buffer+len/2, len/2);
@@ -300,9 +301,11 @@ static ssize_t accel_write(struct file *filep, const char *buffer, size_t len, l
 }
 
 static ssize_t camera_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
+	printk("camera read: len is %zu\n", len);
     int res;
     volatile int i;
     i = 0;
+	len = 25;
 
     unsigned long err;
     err = copy_to_user(buffer, virtual_buff0, 1);

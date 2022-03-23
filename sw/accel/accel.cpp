@@ -65,7 +65,9 @@ void g_blur(vector<vector<int>>& img, vector<vector<int>>& out, vector<int> win)
 			} cout << endl;
 #endif
 			accel.write(o, 8 * win_len * win_len); // write to 1gb dram
-     		accel.read(res, win_len); // read result of hw accleration
+			size_t sz = 4;
+			cout << "size is " << sz << endl;
+     		accel.read(res, sz); // read result of hw accleration
 #ifdef DEBUG_PRINT
 			cout << "result of dot product is " << (int)res[0] << endl;
 #endif

@@ -1,1 +1,0 @@
-g++ test.cpp -o test -std=c++98 -pedantic && ./test

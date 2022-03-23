@@ -1,2 +1,0 @@
-gcc -c -fPIC unit_test.c -o unit_test.o -std=c99
-gcc unit_test.o -shared -o unit_test.so

@@ -22,6 +22,21 @@ static void parse_response(string& in, vector<vector<int>>& res){
 	}
 }
 
+static void form_reply(vector<vector<int>>& in, string& res){
+	res = "<";
+	for(int i = 0; i < in.size(); i++){
+		string curr = "<";
+		for(int j = 0; j < in[i].size(); j++){
+			curr += to_string(in[i][j]);
+			if(j < in[i].size() - 1)
+				curr += ",";
+		}	
+		curr += ">";
+		res += curr;
+	}
+	res += ">";
+}
+
 int main(){
 	
     ifstream camera;
@@ -48,21 +63,27 @@ int main(){
 		//getline(response, line);
 		//cout << line << endl;
 		
-		line = "[[1, 2, 3], [5, 6, 7], [1, 2, 3]]";
+		line = "[[1, 2, 3, 4], [4, 5, 6, 4], [7, 8, 9, 4]]";
 		vector<vector<int>> img;
 		parse_response(line, img);
 		
 
 		//acclerating	
-		vector<int> window = {1, 1, 1, 1};
+		vector<int> window = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 		vector<vector<int>> output(img_height - win_len + 1, vector<int>(img_width - win_len + 1));
-		//g_blur(img, output, window);
-		test();
-
-		//for(auto& v : output){
-		//	for(auto i : v) cout << i << ", ";
-		//	cout << endl;
-		//}
+		g_blur(img, output, window);
+		
+		cout << "result in client.cpp is " << endl;
+		for(auto& v : output){
+			for(auto i : v) cout << i << ", ";
+			cout << endl;
+		}
+		
+		string res;	
+		form_reply(output, res);
+		cout << "formed reply is " << res << endl;
+		string cmd = "curl -X 'POST' 'http://ec2-54-172-213-79.compute-1.amazonaws.com:8080/accel_result?input=" + res + "'";
+		system(cmd.c_str());	
 		break;
 	}
 	
