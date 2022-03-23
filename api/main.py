@@ -19,7 +19,7 @@ import sys
 import cv2
 import imutils
 sys.path.append("..")
-from alpr.alpr import ALPR, get_lp
+from alpr.alpr import ALPR
 import pytesseract
 
 app = FastAPI()
