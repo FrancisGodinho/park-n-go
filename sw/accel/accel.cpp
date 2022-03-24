@@ -11,21 +11,11 @@ int setup_arr(vector<int>& a1, int* a2, char* o, int n) {
 	// expands, and concateates a1 and a2
 	// expanding: [1, 2, 3] -> [1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0]
     int i;
-    for (i = 0; i < n * 4; i++) {
- 	if (i % 4 == 0) {
-           o[i] = a1[i/4];
-	}
-        else {
-           o[i] = 0;
-        }
+    for (i = 0; i < n * 4; i+=4) {
+        o[i] = a1[i/4];
     }
-    for (i = n * 4; i < n * 2 * 4; i++) {
- 	if (i % 4 == 0) {
-           o[i] = a2[(i-n*4)/4];
-	}
-        else {
-           o[i] = 0;
-        }
+    for (i = n * 4; i < n * 2 * 4; i+=4) {
+        o[i] = a2[(i-n*4)/4];
     }
      
     return 0;
@@ -34,21 +24,23 @@ int setup_arr(vector<int>& a1, int* a2, char* o, int n) {
 void g_blur(vector<vector<int>>& img, vector<vector<int>>& out, vector<int> win){	
 	int i, j;
 	int p, q;
-	char res[4];
+	char res[32];
 	int curr_img[win_len * win_len];
+	cout << img.size() << endl;
+	cout << img[0].size() << endl;
 	curr_img[0] = img[0][0];
 	for(i = 0; i < img_height - win_len + 1; i++){
 		for(j = 0; j < img_width - win_len + 1; j++){
 			// flatten the array
 			for(p = i; p < i + win_len; p++){
 				for(q = j; q < j + win_len; q++){
-					curr_img[(p - i)*win_len + (q - j)] = img[p][q];
+					curr_img[(p - i) * win_len + (q - j)] = img[p][q];
 				}
 			}
+			char o[8 * win_len * win_len] = {0}; // array to write to 1gb dram
     		fstream accel;
 			// open the kernel module
     		accel.open("/dev/cpen391_accel_erator", ios::binary | ios::in | ios::out);
-			char o[8 * win_len * win_len]; // array to write to 1gb dram
     		setup_arr(win, curr_img, o, win_len * win_len); // create o
 #ifdef DEBUG_PRINT
 			cout << "printing curr_img " << endl;
@@ -65,14 +57,12 @@ void g_blur(vector<vector<int>>& img, vector<vector<int>>& out, vector<int> win)
 			} cout << endl;
 #endif
 			accel.write(o, 8 * win_len * win_len); // write to 1gb dram
-			size_t sz = 4;
-			cout << "size is " << sz << endl;
-     		accel.read(res, sz); // read result of hw accleration
+     		accel.read(o, 25); // read result of hw accleration
 #ifdef DEBUG_PRINT
-			cout << "result of dot product is " << (int)res[0] << endl;
+			cout << "result of dot product is " << (int)o[0] << endl;
 #endif
-			out[i][j] = res[0]; // write the result to out array
-     		accel.close(); // close the kernel module
+			out[i][j] = o[0] | (o[1] << 8) | (o[2] << 16) | (o[3] << 24); // write the result to out array
+            accel.close(); // close the kernel module
 		}
 	}
 }

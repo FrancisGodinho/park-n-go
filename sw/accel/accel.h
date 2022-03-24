@@ -6,15 +6,15 @@
 #include <string> 
 #include <vector>
 
-#define DEBUG_PRINT
-#define PRINT_BLUR_RESULT
+//#define DEBUG_PRINT
+//#define PRINT_BLUR_RESULT
 
 using namespace std;
 
 // set constants
-const int img_height = 3;
-const int img_width = 4;
-const int win_len = 3;
+const int img_height = 150;//TODO: Change these!
+const int img_width = 200;
+const int win_len = 5;
 const int real_image_height = 480;	
 const int real_image_width = 640;	
 const int pixels = 4;	
