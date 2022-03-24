@@ -102,11 +102,6 @@ const LoginScreen = ({
             ) : null}
             <CustomButton
               disabled={!formik.values.email || !formik.values.password}
-              style={
-                !formik.values.email || !formik.values.password
-                  ? { backgroundColor: Colors.lightGray }
-                  : null
-              }
               text="Login"
               onPress={formik.handleSubmit}
             />
@@ -140,7 +135,7 @@ const styles = StyleSheet.create({
     flex: 2,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
-    backgroundColor: Colors.lightBlack,
+    backgroundColor: Colors.black,
   },
   bottomCont: {
     flex: 1,

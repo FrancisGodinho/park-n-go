@@ -1,3 +1,4 @@
+import os
 from skimage.segmentation import clear_border
 import pytesseract
 import numpy as np
@@ -5,10 +6,10 @@ import imutils
 from imutils import paths
 import cv2
 
-from gaussian_blur import gaussian_blur
+# from gaussian_blur import gaussian_blur
 
 class ALPR:
-    def __init__(self, minAR=2, maxAR=5, debug=False):
+    def __init__(self, minAR=2, maxAR=6, debug=False):
         # stores min and max aspect ratios for license plates
         # debug determines whether or not to display intermediate results
         self.minAR = minAR
@@ -23,21 +24,21 @@ class ALPR:
             # check to see if we should wait for keypress
             if waitKey:
                 cv2.waitKey(0)
-                
-    def locate_license_plate_candidates(self, gray, keep=5):
+
+    def image_processing_gauss(self):
         # perform blackhat morphological operation (reveal dark regions on light background)
         # ie license plates
         rectKern = cv2.getStructuringElement(cv2.MORPH_RECT, (13, 5))
-        blackhat = cv2.morphologyEx(gray, cv2.MORPH_BLACKHAT, rectKern)
+        blackhat = cv2.morphologyEx(self.gray, cv2.MORPH_BLACKHAT, rectKern)
         self.debug_imshow("Blackhat", blackhat)
         
         # find regions in image that are light
         # we clean up the image by filling small holes (black regions) with white
         # in order to get a large white region for the license plate
         squareKern = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-        light = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, squareKern)
-        light = cv2.threshold(light, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-        self.debug_imshow("Light regions", light)
+        light = cv2.morphologyEx(self.gray, cv2.MORPH_CLOSE, squareKern)
+        self.light = cv2.threshold(light, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+        self.debug_imshow("Light regions", self.light)
         
         # compute gradient of blackhat image in x direction which 
         # should emphasize the characters on thelicense plate
@@ -47,10 +48,14 @@ class ALPR:
         gradX = 255 * ((gradX - minVal) / (maxVal - minVal))
         gradX = gradX.astype("uint8")
         self.debug_imshow("Scharr", gradX)
-        
+        self.gauss = cv2.GaussianBlur(gradX, (5, 5), 0)
+        return gradX
+                
+    def locate_license_plate_candidates(self, gradX, keep=5):
+        gradX = self.gauss
+        rectKern = cv2.getStructuringElement(cv2.MORPH_RECT, (17, 4))
         # blur the gradient representation, applying a closing operation,
         # and threshold the image using Otsu's method
-        gradX = cv2.GaussianBlur(gradX, (5, 5), 0)
         gradX = cv2.morphologyEx(gradX, cv2.MORPH_CLOSE, rectKern)
         thresh = cv2.threshold(gradX, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
         self.debug_imshow("Grad Thresh", thresh)
@@ -61,7 +66,7 @@ class ALPR:
         self.debug_imshow("Grad Erode/Dilate", thresh)
         
         # Take bitwise AND of threshold result and light region of the image
-        thresh = cv2.bitwise_and(thresh, thresh, mask=light)
+        # thresh = cv2.bitwise_and(thresh, thresh, mask=self.light)
         thresh = cv2.dilate(thresh, None, iterations=2)
         thresh = cv2.erode(thresh, None, iterations=1)
         self.debug_imshow("Final", thresh, waitKey=True)
@@ -74,10 +79,11 @@ class ALPR:
         
         return cnts
     
-    def locate_license_plate(self, gray, candidates, clearBorder=False):
+    def locate_license_plate(self, candidates, clearBorder=True, pad=5):
         # initialize license plate contour and region of interest (ROI)
         lpCnt = None
         roi = None
+        img_h, img_w = self.gray.shape
         
         # loop over the license plate candidate contours
         for c in candidates:
@@ -90,7 +96,7 @@ class ALPR:
                 # store the license plate contour and extract the license 
                 # plate from the grayscale image and then threshold it
                 lpCnt = c
-                licensePlate = gray[y:y + h, x:x + w]
+                licensePlate = self.gray[max(y - pad, 0):min(y + h + pad, img_h), max(x - pad, 0):min(x + w + 2*pad, img_w)]
                 roi = cv2.threshold(licensePlate, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
                 
                 # check to see if we should clear any pixels touching the border, 
@@ -116,92 +122,70 @@ class ALPR:
         options += f" --psm {psm}"
         
         return options
-                
-    def find_and_ocr(self, image, psm=7, clearBorder=False):
-        # initialize license plate text
-        lpText = None
-        
+
+    def get_gauss_image(self):
         # convert image to grayscale, locate all potential licesne plate locations, 
         # process the candidates and return actual license plate
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        candidates = self.locate_license_plate_candidates(gray)
-        (lp, lpCnt) = self.locate_license_plate(gray, candidates, clearBorder=clearBorder)
-        
-        # only OCR the license plate if the license plate ROI is not empty
-        if lp is not None:
-            # OCR the license plate
-            options = self.build_tesseract_options(psm=psm)
-            lpText = pytesseract.image_to_string(lp, config=options)
-            self.debug_imshow("License Plate", lp)
-            
-        # return OCR'd license plate text and the contour associated with the license plate region
-        return (lpText, lpCnt)
-
+        gauss_image = self.image_processing_gauss()
+        return gauss_image
+                
 def cleanup_text(text):
     # strip out non-ASCII text to draw text on image using OpenCV
     return "".join([c if ord(c) < 128 else "" for c in text]).strip()
 
-alpr = ALPR(debug=False)
-
-def get_lp(image):
-    images = [
-        imutils.resize(image, width=600),
-        imutils.resize(image, width=500),
-        imutils.resize(image, width=400),
-        imutils.resize(image, width=300),
-        imutils.resize(image, width=200),
-    ]
-
-    for image in images:
-        # Apply automatic license plate recognition
-        (lpText, lpCnt) = alpr.find_and_ocr(image)
-        
-        # only continue if license plate successfully OCR'd
-        if lpText is not None and lpCnt is not None:
-            # fit bounding box to license plate contour and draw bounding box on license plate
-            box = cv2.boxPoints(cv2.minAreaRect(lpCnt))
-            box = box.astype("int")
-            cv2.drawContours(image, [box], -1, (0, 255, 0), 2)
-            
-            # compute unrotated bounding box for the license plate and draw OCR'd license plate text on the image
-            (x, y, w, h) = cv2.boundingRect(lpCnt)
-            print(x, y, w, h)
-            cv2.putText(image, cleanup_text(lpText), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
-            
-            # show the output ANPR image
+def main():
+    lpText = None
+    alpr = ALPR(debug=False)
+    for image_name in sorted(os.listdir('images__/')):
+        if image_name == '.DS_Store':
+            continue
+        print(image_name)
+        image = cv2.imread('images__/' + image_name)
+        image = imutils.resize(image, width=250)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        alpr.gray = gray
+        res = alpr.get_gauss_image()
+        # gauss
+        image = 'poop'
+        # gauss
+        candidates = alpr.locate_license_plate_candidates(image)
+        (lp, lpCnt) = alpr.locate_license_plate(candidates, clearBorder=False)
+        # only OCR the license plate if the license plate ROI is not empty
+        if lp is not None:
+            # OCR the license plate
+            # lp = imutils.resize(lp, width=200)
+            options = alpr.build_tesseract_options(psm=7)
+            lpText = pytesseract.image_to_string(lp, config=options)
             print(lpText)
-            cv2.imshow("Test", image)
-            cv2.waitKey(0)
-        else:
-            print("None")
-
-image = cv2.imread('./images__/1.png')
-get_lp(image)
+            alpr.debug_imshow("License Plate", lp)
+        if lpText is None or lpText == '':
+            print("No Plate")
 
 
-def get_lp_dir(dir="./images/"):
-    imagePaths = sorted(list(paths.list_images(dir)))
+def main_single():
+    alpr = ALPR(debug=True)
+    lpText = None
+    image = cv2.imread('images__/15.png')
+    image = imutils.resize(image, width=250)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    alpr.gray = gray
+    res = alpr.get_gauss_image()
+    # gauss
+    image = cv2.GaussianBlur(res, (5, 5), 0)
+    # gauss
+    candidates = alpr.locate_license_plate_candidates(image)
+    (lp, lpCnt) = alpr.locate_license_plate(candidates, clearBorder=False)
+    # only OCR the license plate if the license plate ROI is not empty
+    if lp is not None:
+        # OCR the license plate
+        # lp = imutils.resize(lp, width=3250)
+        options = alpr.build_tesseract_options(psm=13)
+        lpText = pytesseract.image_to_string(lp, config=options)
+        print(lpText)
+        alpr.debug_imshow("License Plate", lp)
+    if lpText is None or lpText == '':
+        print("No Plate")
 
-    for imagePath in imagePaths:
-        # Load image and resize
-        image = cv2.imread(imagePath)
-        image = imutils.resize(image, width=600)
-        
-        # Apply automatic license plate recognition
-        (lpText, lpCnt) = alpr.find_and_ocr(image)
-        
-        # only continue if license plate successfully OCR'd
-        if lpText is not None and lpCnt is not None:
-            # fit bounding box to license plate contour and draw bounding box on license plate
-            box = cv2.boxPoints(cv2.minAreaRect(lpCnt))
-            box = box.astype("int")
-            cv2.drawContours(image, [box], -1, (0, 255, 0), 2)
-            
-            # compute unrotated bounding box for the license plate and draw OCR'd license plate text on the image
-            (x, y, w, h) = cv2.boundingRect(lpCnt)
-            cv2.putText(image, cleanup_text(lpText), (x, y - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
-            
-            # show the output ANPR image
-            print(f"[{imagePath}] {lpText}")
-            cv2.imshow(f"{imagePath}", image)
-            cv2.waitKey(0)
+if __name__ == "__main__":
+    # main()
+    main_single()

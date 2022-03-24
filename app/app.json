@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ken-app",
-    "slug": "ken-app",
+    "name": "app",
+    "slug": "app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

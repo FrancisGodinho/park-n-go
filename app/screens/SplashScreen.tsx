@@ -5,11 +5,11 @@ import Colors from "../constants/Colors";
 
 type Props = {};
 
-const SplashScreen = (props: Props) => {
+const SplashScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logo}>
-        <FontAwesome5 name="car" size={40} color={Colors.lightBlack} />
+        <FontAwesome5 name="car" size={40} color={Colors.black} />
       </View>
       <Text>Parking Bot</Text>
     </SafeAreaView>

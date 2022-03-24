@@ -1,5 +1,6 @@
 import {
   KeyboardAvoidingView,
+  KeyboardTypeOptions,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -15,7 +16,7 @@ interface Props {
   formik: any;
   icon?: string;
   isPass?: boolean;
-  keyboardType?: string;
+  keyboardType?: KeyboardTypeOptions;
   name: string;
   placeholder: string;
   refValue?: any;
@@ -29,13 +30,13 @@ const CustomTextInput = ({
   formik,
   icon,
   isPass,
-  keyboardType,
   name,
   placeholder,
   refValue,
   style,
   value,
   onSubmitEditing,
+  keyboardType = "default",
 }: Props) => {
   const [showPass, setShowPass] = useState(false);
 
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 10,
     paddingVertical: 10,
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.lightBlack,
   },
   icon: {
     width: 30,

@@ -5,19 +5,20 @@ import Colors from "../constants/Colors";
 
 interface Props {
   disabled: boolean;
-  style: object | null;
   text: string;
   onPress: any;
 }
 
-const CustomButton = ({ disabled, style, text, onPress }: Props) => {
+const CustomButton = ({ disabled, text, onPress }: Props) => {
   return (
     <TouchableOpacity
-      style={[styles.container, style]}
+      style={[styles.container, disabled && styles.disabled]}
       disabled={disabled}
       onPress={onPress}
     >
-      <Text style={[Headers.p, styles.text]}>{text}</Text>
+      <Text style={[Headers.p, styles.text, disabled && styles.disabledText]}>
+        {text}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -32,5 +33,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: Colors.primary,
   },
-  text: { textAlign: "center", color: "white" },
+  disabled: { backgroundColor: Colors.lightBlack },
+  text: { textAlign: "center", color: Colors.white },
+  disabledText: { color: Colors.darkWhite },
 });

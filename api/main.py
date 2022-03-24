@@ -5,12 +5,23 @@ from fastapi.middleware.cors import CORSMiddleware
 import firebase_admin
 from firebase_admin import credentials, firestore
 import os
+import subprocess
 from datetime import datetime
 from typing import List
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 import aiofiles
+import imageio
+import numpy as np
+
+import sys
+import cv2
+import imutils
+sys.path.append("..")
+from alpr.alpr import ALPR
+import pytesseract
+import ast
 
 app = FastAPI()
 
@@ -38,6 +49,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+alpr = ALPR(debug=False)
+
+def string_to_numpy2(content):
+    return 0
+
+def string_to_numpy(str):
+    print(str)
+    str = str.replace('<', '[').replace('>', ']')
+    lst = ast.literal_eval(str)
+    arr = np.array(lst, dtype='float64')
+    return arr
 
 @app.get("/test")
 async def Test():
@@ -45,15 +67,90 @@ async def Test():
 
 @app.post("/test_post")
 async def TestPost(val: int = 0):
+    print(val)
     return f"testing value {val}"
 
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
-    async with aiofiles.open("img.png", 'wb') as out_file:
-        content = await file.read()  # async read
-        await out_file.write(content)  # async write
-    return {"filename": file.filename}
+    content = await file.read()  # async read
+    print(len(content))
+
+    raw_array = np.fromstring(content, dtype=np.uint8)
+    raw_array = raw_array.reshape((480, 640, 4))
+    image = raw_array[:, :, 0:3]
+    imageio.imwrite("img.png", image)
+    image = cv2.imread('img.png')
+    lpText = None
+    image = imutils.resize(image, width=250)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    alpr.gray = gray
+    res = alpr.get_gauss_image()
+    # gauss
+    image = cv2.GaussianBlur(res, (5, 5), 0)
+    # gauss
+    candidates = alpr.locate_license_plate_candidates(image)
+    (lp, lpCnt) = alpr.locate_license_plate(candidates, clearBorder=False)
+    # only OCR the license plate if the license plate ROI is not empty
+    if lp is not None:
+        # OCR the license plate
+        # lp = imutils.resize(lp, width=3250)
+        options = alpr.build_tesseract_options(psm=13)
+        lpText = pytesseract.image_to_string(lp, config=options)
+        print(lpText)
+        alpr.debug_imshow("License Plate", lp)
+    if lpText is None or lpText == '':
+        print("No Plate")
+    # image = imutils.resize(image, width=250)
+    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # alpr.gray = gray
+    # res = alpr.get_gauss_image()
+    return res.tolist()
+
+@app.post("/accel_result")
+async def acceleration_result(file: UploadFile = File(...)):
+    lpText = None
+    content = await file.read()
+    #print(content)
+    print(type(content))
+    image = str(content)[2:-1]
+    print(image[0])
+    image =  string_to_numpy(image)
+    image /= 273
+    image = image.astype('uint8')
+    candidates = alpr.locate_license_plate_candidates(image)
+    (lp, lpCnt) = alpr.locate_license_plate(candidates, clearBorder=False)
+    # only OCR the license plate if the license plate ROI is not empty
+    if lp is not None:
+        # OCR the license plate
+        options = alpr.build_tesseract_options(psm=13)
+        lpText = pytesseract.image_to_string(lp, config=options)
+        print(lpText)
+        alpr.debug_imshow("License Plate", lp)
+    if lpText is None or lpText == '':
+        print("No Plate")
 
 @app.get("/view_image")
 async def view_image():
     return FileResponse("./img.png")
+
+@app.get("/view_image_date")
+async def view_image(date: str):
+    return FileResponse(f"../archives/img_{date}.png")
+
+@app.post("/server_to_de1")
+async def server_to_de1(image="hello"):
+    print(image)
+    return {"result":[[1, 2, 3, 4], [5, 6, 7, 8]]}
+
+@app.get("/get_plate")
+async def get_plate():
+    #async with aiofiles.open(f"img.png", 'wb') as out_file:
+    #    content = await file.read()  # async read
+    #    await out_file.write(content)  # async write
+
+    #lisence plate recognition
+    alpr = ALPR()
+    image = cv2.imread("img.png")
+    image = imutils.resize(image, width=600)
+    (lpText, lpCnt) = alpr.find_and_ocr(image)
+    return lpText
