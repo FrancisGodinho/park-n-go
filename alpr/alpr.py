@@ -8,7 +8,7 @@ import cv2
 # from gaussian_blur import gaussian_blur
 
 class ALPR:
-    def __init__(self, minAR=2, maxAR=5, debug=False):
+    def __init__(self, minAR=2, maxAR=6, debug=False):
         # stores min and max aspect ratios for license plates
         # debug determines whether or not to display intermediate results
         self.minAR = minAR
@@ -37,7 +37,7 @@ class ALPR:
         squareKern = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
         light = cv2.morphologyEx(self.gray, cv2.MORPH_CLOSE, squareKern)
         self.light = cv2.threshold(light, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-        self.debug_imshow("Light regions", light)
+        self.debug_imshow("Light regions", self.light)
         
         # compute gradient of blackhat image in x direction which 
         # should emphasize the characters on thelicense plate
@@ -52,7 +52,6 @@ class ALPR:
                 
     def locate_license_plate_candidates(self, gradX, keep=5):
         gradX = self.gauss
-        print(gradX)
         rectKern = cv2.getStructuringElement(cv2.MORPH_RECT, (13, 5))
         # blur the gradient representation, applying a closing operation,
         # and threshold the image using Otsu's method
@@ -66,7 +65,7 @@ class ALPR:
         self.debug_imshow("Grad Erode/Dilate", thresh)
         
         # Take bitwise AND of threshold result and light region of the image
-        thresh = cv2.bitwise_and(thresh, thresh, mask=self.light)
+        # thresh = cv2.bitwise_and(thresh, thresh, mask=self.light)
         thresh = cv2.dilate(thresh, None, iterations=2)
         thresh = cv2.erode(thresh, None, iterations=1)
         self.debug_imshow("Final", thresh, waitKey=True)
@@ -178,8 +177,9 @@ def cleanup_text(text):
 #     return (lpText, lpCnt)
 
 def main():
+    lpText = None
     alpr = ALPR(debug=False)
-    image = cv2.imread('images__/4.png')
+    image = cv2.imread('images__/6.png')
     image = imutils.resize(image, width=200)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     alpr.gray = gray
@@ -199,8 +199,8 @@ def main():
     if lpText is None or lpText == '':
         print("No Plate")
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
 
 # def get_lp(image):
 #     image = imutils.resize(image, width=300),
