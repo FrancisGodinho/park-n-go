@@ -35,15 +35,15 @@ static size_t image_memory_size;
 static int32_t last_image_number;
 
 // Function prototypes
-static int camera_open(struct inode *, struct file *);
+static int accel_open(struct inode *, struct file *);
 static int camera_release(struct inode *, struct file *);
-static ssize_t camera_read(struct file *, char *, size_t, loff_t *);
+static ssize_t accel_read(struct file *, char *, size_t, loff_t *);
 static ssize_t accel_write(struct file *, const char *, size_t, loff_t *);
 int camera_capture_image(char* user_read_buffer);
 
 static struct file_operations fops = {
-    .open = camera_open,
-    .read = camera_read,
+    .open = accel_open,
+    .read = accel_read,
     .write = accel_write, 
     .release = camera_release,
 };
@@ -107,11 +107,11 @@ static struct kobject *l2a01_camera_kobj;
 
 
 //------INIT AND EXIT FUNCTIONS-----//
-static int __init camera_driver_init(void) {
+static int __init accel_driver_init(void) {
     int result;
     void* SDRAMC_virtual_address;
 
-    printk(KERN_INFO DRIVER_NAME": Init\n");
+    //printk(KERN_INFO DRIVER_NAME": Init\n");
     // Dynamically allocate a major number for the device
     majorNumber = register_chrdev(0, DRIVER_NAME, &fops);
     if (majorNumber < 0) {
@@ -170,29 +170,27 @@ error_class_create:
     return -1;
 }
 
-static void __exit camera_driver_exit(void) {
+static void __exit accel_driver_exit(void) {
     device_destroy(class, MKDEV(majorNumber, MINOR_RGBG));
     class_unregister(class);
     class_destroy(class);
     unregister_chrdev(majorNumber, DRIVER_NAME);
     kobject_put(l2a01_camera_kobj);
-    printk(KERN_INFO DRIVER_NAME": Exit\n");
+    //printk(KERN_INFO DRIVER_NAME": Exit\n");
 }
 
 
 //-----CHAR DEVICE DRIVER SPECIFIC FUNCTIONS-----//
-static int camera_open(struct inode *inodep, struct file *filep) {
+static int accel_open(struct inode *inodep, struct file *filep) {
     int image_writer_base;
     int image_writer_span;
     int pixel_size;
     int counter;
-    printk("-------------------OPENING--------------------\n");
     //Findout which device is being open using the minor numbers
     int dev_number = iminor(filep->f_path.dentry->d_inode);
 
     // Establish image_writer and pixel_size based on image_type
     if (dev_number == MINOR_RGBG) {
-        printk(KERN_INFO DRIVER_NAME": Open ACCEL\n");
         image_writer_base = AVALON_ACCEL_BASE;
         image_writer_span = AVALON_ACCEL_SPAN;
         pixel_size = sizeof(u8) * 4;
@@ -223,7 +221,6 @@ static int camera_open(struct inode *inodep, struct file *filep) {
     // contiguous memory. Accesses to the memory by the CPU are the same
     // as a cache miss when the cache is used. The CPU does not have to
     // invalidate or flush the cache which can be time consuming.
-    printk("dma alloc\n");
     virtual_buff0 = dma_alloc_coherent(
         NULL,
         image_memory_size,
@@ -246,103 +243,46 @@ static int camera_open(struct inode *inodep, struct file *filep) {
         return -1;
     }
 
-    //iowrite32(image_writer_mode, image_writer + CAPTURE_MODE);
-
-    //// Save physical addresses into the avalon_camera
-    //iowrite32(physical_buff0, image_writer + CAPTURE_BUFF0);
-    //iowrite32(physical_buff1, image_writer + CAPTURE_BUFF1);
-
-    //// Choose buffer 0 to be used in SINGLE_SHOT
-    //iowrite32(0, image_writer + CAPTURE_BUFFER_SELECT);
-
-    //// Choose to use 2 alternating buffers in CONTINUOUS mode
-    //iowrite32(1, image_writer + CONT_DOUBLE_BUFF);
-
-    //// Set up downsampling as 1 to get the whole image
-    //iowrite32(1, image_writer + CAPTURE_DOWNSAMPLING);
-
-    ////In continuous mode start the capture of images into buff0 and buff1
-
-    ////Stop the capture (to ensure a known state)
-    //iowrite32(0, image_writer + START_CAPTURE); 480    //// Wait until Standby signal is 1. Its the way to ensure that the component
-    //// is not in reset or acquiring a signal.
-    //counter = 10000000;
-    //while((!(ioread32(image_writer + CAPTURE_STANDBY))) && (counter>0)) {
-    //    // Ugly way avoid software to get stuck
-    //    counter--;
-    //}
-    //if (counter == 0) {
-    //    printk(KERN_INFO DRIVER_NAME": Camera no reply\n");
-    //    return ERROR_CAMERA_NO_REPLY;
-    //}
-
-    //// Start the capture
-    //iowrite32(1, image_writer + START_CAPTURE);
-
     is_open = 1;
-    //last_image_number = 0;
-
     return 0;
 }
 
 // TODO
 static ssize_t accel_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
     int i;
-	printk("camera write: len is %d\n", len);
     unsigned long ret = copy_from_user(virtual_buff0, buffer, len/2);
     if (ret != 0){printk("UHOH1\n");}
     ret = copy_from_user(virtual_buff1, buffer+len/2, len/2);
     if (ret != 0){printk("UHOH2\n");}
-    for (i = 0; i < len; i++) {
-        printk("%d ", *(buffer + i));
-    }
-    printk("\n");
     return len;
 }
 
-static ssize_t camera_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
-	printk("camera read: len is %zu\n", len);
-    int res;
+static ssize_t accel_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
+    unsigned int res;
     volatile int i;
     i = 0;
 	len = 25;
-
-    unsigned long err;
-    err = copy_to_user(buffer, virtual_buff0, 1);
-    if (err) {printk("UHOH\n");}
-    printk("%d\n", *buffer);
 
     iowrite32(physical_buff0, image_writer + ACCEL_ADDR0);
     iowrite32(physical_buff1, image_writer + ACCEL_ADDR1);
     iowrite32(len, image_writer + ACCEL_N);
 
-    while (i++ < 5000000);
+   // res = ioread32(image_writer + ACCEL_ADDR0);
+   // res = ioread32(image_writer + ACCEL_ADDR0);
+   // 
+   // res = ioread32(image_writer + ACCEL_ADDR1);
+   // res = ioread32(image_writer + ACCEL_ADDR1);
+   // 
+   // res = ioread32(image_writer + ACCEL_N);
+   // res = ioread32(image_writer + ACCEL_N);
 
-    res = ioread32(image_writer + ACCEL_ADDR0);
-    res = ioread32(image_writer + ACCEL_ADDR0);
-    printk("Res addr0: %d\n", res);
-    printk("physical_0: %d\n", physical_buff0);
-    
-    res = ioread32(image_writer + ACCEL_ADDR1);
-    res = ioread32(image_writer + ACCEL_ADDR1);
-    printk("Res addr1: %d\n", res);
-    printk("physical_1: %d\n", physical_buff1);
-    
-    res = ioread32(image_writer + ACCEL_N);
-    res = ioread32(image_writer + ACCEL_N);
-    printk("N val: %d\n", res);
-     
-    //iowrite32(1, image_writer + ACCEL_START);
+   // res = ioread32(image_writer + ACCEL_SUM);
+    res = ioread32(image_writer + ACCEL_SUM);
 
-    res = ioread32(image_writer + ACCEL_SUM);
-    printk("sum: %d\n", res);
-    res = ioread32(image_writer + ACCEL_SUM);
-    printk("sum: %d\n", res);
-    
-    //iowrite32(0, image_writer + ACCEL_START);
-    
-    //memcpy(buffer, &res, sizeof(res)); 
-  	*buffer = res; 
+	buffer[0] = (res & 0xFF);
+	buffer[1] = (res & 0xFF00) >> 8;
+	buffer[2] = (res & 0xFF0000) >> 26;
+	buffer[3] = (res & 0xFF000000) >> 24;
     return len;
 }
 
@@ -360,7 +300,6 @@ static int camera_release(struct inode *inodep, struct file *filep) {
       return -1;
     }
 
-
     dma_free_coherent(NULL, image_memory_size, virtual_buff0,
       physical_buff0);
     dma_free_coherent(NULL, image_memory_size, virtual_buff1,
@@ -372,5 +311,5 @@ static int camera_release(struct inode *inodep, struct file *filep) {
     return 0;
 }
 
-module_init(camera_driver_init);
-module_exit(camera_driver_exit);
+module_init(accel_driver_init);
+module_exit(accel_driver_exit);
