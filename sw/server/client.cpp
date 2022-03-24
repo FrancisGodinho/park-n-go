@@ -11,44 +11,62 @@
 
 static void parse_response(string& in, vector<vector<int>>& res){
 	vector<int> curr;
-	for(auto c : in){
-		if(c == '[' || c == ' ' || c == ',') continue;
-		else if(c == ']' && curr.size() > 0) {
+	int curr_digit = 0;
+	for(int i = 0; i < in.size(); i++){
+		if(in[i] == ',' && in[i - 1] == ']' && i > 0) continue;
+		if(in[i] == '[' || in[i] == ' ') continue;
+		if(in[i] == ',' ){
+			curr.push_back(curr_digit);
+			curr_digit = 0;
+			continue;
+		}
+		else if(in[i] == ']' && curr.size() > 0) {
+			curr.push_back(curr_digit);
+			curr_digit = 0;
 			res.push_back(curr);
 			curr = vector<int>();
 			continue;
 		}
-		curr.push_back(c - '0');
+		curr_digit *= 10;
+		curr_digit += in[i] - '0';
 	}
 }
 
-static void form_reply(vector<vector<int>>& in, string& res){
-	res = "<";
+static void form_reply(vector<vector<int>>& in, ofstream& f){
+	f << ("[");
 	for(int i = 0; i < in.size(); i++){
-		string curr = "<";
+		string curr = "[";
 		for(int j = 0; j < in[i].size(); j++){
 			curr += to_string(in[i][j]);
 			if(j < in[i].size() - 1)
 				curr += ",";
-		}	
-		curr += ">";
-		res += curr;
+		}
+		if(i < in.size() - 1)
+			curr += "],";
+		else
+			curr += "]";
+		f << (curr);
 	}
-	res += ">";
+	f << ("]");
 }
 
 int main(){
-	
     ifstream camera;
     camera.open("/dev/cpen391_camera_rgbg", std::ios::binary);
 	bool second = false;
 	for(volatile int i = 0; i < 1e7; i++); // some delay
-
+	vector<int> window = {
+		1,4,7,4,1,
+		4,16,26,16,4,
+		7,26,41,26,7,
+		4,16,26,16,4,
+		1,4,7,4,1};
+	
 	while(1){
     	uint32_t image_size = real_image_height * real_image_width * pixels;
     	string result(image_size, '\0');
     	camera.read(&result[0], image_size);
-
+		camera.close();
 		// create new file
 		ofstream myfile;
  		myfile.open ("image");
@@ -56,34 +74,27 @@ int main(){
  		myfile.close();
 
 		// make curl request 
-		//system("curl -L -F 'file=@image' http://ec2-54-172-213-79.compute-1.amazonaws.com:8080/uploadfile > result");	
-    	//fstream response;
-    	//response.open("./result", ios::binary | ios::in | ios::out);
+		system("curl -L -F 'file=@image' http://ec2-54-172-213-79.compute-1.amazonaws.com:8080/uploadfile > result");	
+    	fstream response;
+    	response.open("./result", ios::binary | ios::in | ios::out);
 		string line;
-		//getline(response, line);
-		//cout << line << endl;
-		
-		line = "[[1, 2, 3, 4], [4, 5, 6, 4], [7, 8, 9, 4]]";
+		getline(response, line);
 		vector<vector<int>> img;
 		parse_response(line, img);
 		
-
-		//acclerating	
-		vector<int> window = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+		//accleration
 		vector<vector<int>> output(img_height - win_len + 1, vector<int>(img_width - win_len + 1));
+		cout << "gigng to accel! " << endl;
 		g_blur(img, output, window);
+
+		cout << "Done accel!" << endl;
 		
-		cout << "result in client.cpp is " << endl;
-		for(auto& v : output){
-			for(auto i : v) cout << i << ", ";
-			cout << endl;
-		}
-		
-		string res;	
-		form_reply(output, res);
-		cout << "formed reply is " << res << endl;
-		string cmd = "curl -X 'POST' 'http://ec2-54-172-213-79.compute-1.amazonaws.com:8080/accel_result?input=" + res + "'";
-		system(cmd.c_str());	
+		ofstream repl;
+ 		repl.open ("reply");
+		form_reply(output, repl);
+ 		repl.close();
+		system("curl -L -F 'file=@reply' http://ec2-54-172-213-79.compute-1.amazonaws.com:8080/accel_result");	
+
 		break;
 	}
 	
