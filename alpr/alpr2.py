@@ -163,7 +163,7 @@ def main():
 
 
 def main_single():
-    alpr = ALPR(debug=True)
+    alpr = ALPR(debug=False)
     lpText = None
     image = cv2.imread('images__/26.png')
     image = imutils.resize(image, width=250)
