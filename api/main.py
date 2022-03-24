@@ -80,10 +80,30 @@ async def create_upload_file(file: UploadFile = File(...)):
     image = raw_array[:, :, 0:3]
     imageio.imwrite("img.png", image)
     image = cv2.imread('img.png')
+    lpText = None
     image = imutils.resize(image, width=250)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     alpr.gray = gray
     res = alpr.get_gauss_image()
+    # gauss
+    image = cv2.GaussianBlur(res, (5, 5), 0)
+    # gauss
+    candidates = alpr.locate_license_plate_candidates(image)
+    (lp, lpCnt) = alpr.locate_license_plate(candidates, clearBorder=False)
+    # only OCR the license plate if the license plate ROI is not empty
+    if lp is not None:
+        # OCR the license plate
+        # lp = imutils.resize(lp, width=3250)
+        options = alpr.build_tesseract_options(psm=13)
+        lpText = pytesseract.image_to_string(lp, config=options)
+        print(lpText)
+        alpr.debug_imshow("License Plate", lp)
+    if lpText is None or lpText == '':
+        print("No Plate")
+    # image = imutils.resize(image, width=250)
+    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # alpr.gray = gray
+    # res = alpr.get_gauss_image()
     return res.tolist()
 
 @app.post("/accel_result")
