@@ -146,7 +146,7 @@ def main():
         alpr.gray = gray
         res = alpr.get_gauss_image()
         # gauss
-        image = cv2.GaussianBlur(res, (5, 5), 0)
+        image = 'poop'
         # gauss
         candidates = alpr.locate_license_plate_candidates(image)
         (lp, lpCnt) = alpr.locate_license_plate(candidates, clearBorder=False)
@@ -163,9 +163,9 @@ def main():
 
 
 def main_single():
-    lpText = None
     alpr = ALPR(debug=True)
-    image = cv2.imread('images__/9.png')
+    lpText = None
+    image = cv2.imread('images__/15.png')
     image = imutils.resize(image, width=250)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     alpr.gray = gray
@@ -186,6 +186,6 @@ def main_single():
     if lpText is None or lpText == '':
         print("No Plate")
 
-# if __name__ == "__main__":
-#     main()
-#     # main_single()
+if __name__ == "__main__":
+    # main()
+    main_single()
