@@ -1,0 +1,10 @@
+#!/bin/sh
+'''exec' "/Users/kenjohnson/Documents/Classes/Year 4 Term 2/CPEN 391/l2a-01-devicedrivers/alpd/venv/bin/python3.9" "$0" "$@"
+' '''
+# -*- coding: utf-8 -*-
+import re
+import sys
+from pip._internal.cli.main import main
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
