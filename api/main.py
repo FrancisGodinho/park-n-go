@@ -23,7 +23,10 @@ from alpr.alpr import ALPR
 import pytesseract
 import ast
 
+from test import software_dot_product
+
 app = FastAPI()
+test_img = [[]]
 
 # Firebase initialization
 # Use the application default credentials
@@ -55,7 +58,7 @@ def string_to_numpy2(content):
     return 0
 
 def string_to_numpy(str):
-    print(str)
+    #print(str)
     str = str.replace('<', '[').replace('>', ']')
     lst = ast.literal_eval(str)
     arr = np.array(lst, dtype='float64')
@@ -73,15 +76,17 @@ async def TestPost(val: int = 0):
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
     content = await file.read()  # async read
-    print(len(content))
-
+    #print(len(content))
     raw_array = np.fromstring(content, dtype=np.uint8)
     raw_array = raw_array.reshape((480, 640, 4))
     image = raw_array[:, :, 0:3]
+    image += 10
+    #print(image)
     imageio.imwrite("img.png", image)
+    #return 0 #TODO: REMOVE
     image = cv2.imread('img.png')
     lpText = None
-    image = imutils.resize(image, width=250)
+    image = imutils.resize(image, width=300)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     alpr.gray = gray
     res = alpr.get_gauss_image()
@@ -96,7 +101,7 @@ async def create_upload_file(file: UploadFile = File(...)):
         # lp = imutils.resize(lp, width=3250)
         options = alpr.build_tesseract_options(psm=13)
         lpText = pytesseract.image_to_string(lp, config=options)
-        print(lpText)
+        print(f"software says: {lpText}")
         alpr.debug_imshow("License Plate", lp)
     if lpText is None or lpText == '':
         print("No Plate")
@@ -104,17 +109,39 @@ async def create_upload_file(file: UploadFile = File(...)):
     # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # alpr.gray = gray
     # res = alpr.get_gauss_image()
-    return res.tolist()
+    res = res.tolist()
+    #TODO: Remove
+    #for p in range(5):
+    #    for q in range(5):
+    #        print(res[p][q], ", ")
+    #    print()
+    #test_img[0] = software_dot_product(res)
+    return res
 
 @app.post("/accel_result")
 async def acceleration_result(file: UploadFile = File(...)):
+
+    def comp(a, b):
+        for x, y in zip(a, b):
+            for i, j in zip(x, y):
+                if i != j:
+                    print(f"i is {i}, j is {j}")
+                    return False;
+        return True;
     lpText = None
     content = await file.read()
     #print(content)
-    print(type(content))
+    #print(type(content))
     image = str(content)[2:-1]
-    print(image[0])
+    print(f"return image is {image[0:5]}")
+    #print(image[0])
     image =  string_to_numpy(image)
+    if comp(image, test_img[0]):
+        print("Hardware is verified!")
+    else:
+        print("Hardware error!")
+        #print(test_img[0])
+        #print(image[0])
     image /= 273
     image = image.astype('uint8')
     candidates = alpr.locate_license_plate_candidates(image)
@@ -124,7 +151,7 @@ async def acceleration_result(file: UploadFile = File(...)):
         # OCR the license plate
         options = alpr.build_tesseract_options(psm=13)
         lpText = pytesseract.image_to_string(lp, config=options)
-        print(lpText)
+        print(f"hardware says: {lpText}")
         alpr.debug_imshow("License Plate", lp)
     if lpText is None or lpText == '':
         print("No Plate")
