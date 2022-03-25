@@ -80,10 +80,13 @@ async def create_upload_file(file: UploadFile = File(...)):
     raw_array = np.fromstring(content, dtype=np.uint8)
     raw_array = raw_array.reshape((480, 640, 4))
     image = raw_array[:, :, 0:3]
+    image += 10
+    #print(image)
     imageio.imwrite("img.png", image)
+    #return 0 #TODO: REMOVE
     image = cv2.imread('img.png')
     lpText = None
-    image = imutils.resize(image, width=250)
+    image = imutils.resize(image, width=300)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     alpr.gray = gray
     res = alpr.get_gauss_image()
@@ -98,7 +101,7 @@ async def create_upload_file(file: UploadFile = File(...)):
         # lp = imutils.resize(lp, width=3250)
         options = alpr.build_tesseract_options(psm=13)
         lpText = pytesseract.image_to_string(lp, config=options)
-        print(lpText)
+        print(f"software says: {lpText}")
         alpr.debug_imshow("License Plate", lp)
     if lpText is None or lpText == '':
         print("No Plate")
@@ -108,11 +111,11 @@ async def create_upload_file(file: UploadFile = File(...)):
     # res = alpr.get_gauss_image()
     res = res.tolist()
     #TODO: Remove
-    for p in range(5):
-        for q in range(5):
-            print(res[p][q], ", ")
-        print()
-    test_img[0] = software_dot_product(res)
+    #for p in range(5):
+    #    for q in range(5):
+    #        print(res[p][q], ", ")
+    #    print()
+    #test_img[0] = software_dot_product(res)
     return res
 
 @app.post("/accel_result")
@@ -148,7 +151,7 @@ async def acceleration_result(file: UploadFile = File(...)):
         # OCR the license plate
         options = alpr.build_tesseract_options(psm=13)
         lpText = pytesseract.image_to_string(lp, config=options)
-        print(lpText)
+        print(f"hardware says: {lpText}")
         alpr.debug_imshow("License Plate", lp)
     if lpText is None or lpText == '':
         print("No Plate")
