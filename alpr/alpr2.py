@@ -9,7 +9,7 @@ import cv2
 # from gaussian_blur import gaussian_blur
 
 class ALPR:
-    def __init__(self, minAR=2, maxAR=7, debug=False):
+    def __init__(self, minAR=3, maxAR=7, debug=False):
         # stores min and max aspect ratios for license plates
         # debug determines whether or not to display intermediate results
         self.minAR = minAR
@@ -53,7 +53,7 @@ class ALPR:
                 
     def locate_license_plate_candidates(self, gradX, keep=5):
         gradX = self.gauss
-        rectKern = cv2.getStructuringElement(cv2.MORPH_RECT, (18, 4))
+        rectKern = cv2.getStructuringElement(cv2.MORPH_RECT, (25, 4))
         # blur the gradient representation, applying a closing operation,
         # and threshold the image using Otsu's method
         gradX = cv2.morphologyEx(gradX, cv2.MORPH_CLOSE, rectKern)
@@ -141,7 +141,8 @@ def main():
             continue
         print(image_name)
         image = cv2.imread('images__/' + image_name)
-        image = imutils.resize(image, width=250)
+        image = imutils.resize(image, width=400)
+        print(image.shape)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         alpr.gray = gray
         res = alpr.get_gauss_image()
@@ -163,10 +164,11 @@ def main():
 
 
 def main_single():
-    alpr = ALPR(debug=False)
+    alpr = ALPR(debug=True)
     lpText = None
-    image = cv2.imread('images__/26.png')
-    image = imutils.resize(image, width=250)
+    image = cv2.imread('images__/0.png')
+    image = imutils.resize(image, width=400)
+    print(image.shape)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     alpr.gray = gray
     res = alpr.get_gauss_image()

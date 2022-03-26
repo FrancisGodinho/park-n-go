@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, onSnapshot, Timestamp } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "./Firebase";
 
 type ContextState = {
@@ -16,8 +16,10 @@ type ContextState = {
   setIsAuthenticated: Dispatch<SetStateAction<boolean>>;
   isParking: boolean;
   setIsParking: Dispatch<SetStateAction<boolean>>;
-  startTime: Timestamp;
-  setStartTime: Dispatch<SetStateAction<Timestamp>>;
+  startTime: Date | undefined;
+  setStartTime: Dispatch<SetStateAction<Date | undefined>>;
+  parkingHistory: Array<object>;
+  setParkingHistory: Dispatch<SetStateAction<Array<object>>>;
   lotId: string;
   setLotId: Dispatch<SetStateAction<string>>;
   lotName: string;
@@ -29,8 +31,10 @@ const defaultValues: ContextState = {
   setIsAuthenticated: () => {},
   isParking: false,
   setIsParking: () => {},
-  startTime: Timestamp.now(),
+  startTime: undefined,
   setStartTime: () => {},
+  parkingHistory: [],
+  setParkingHistory: () => {},
   lotId: "",
   setLotId: () => {},
   lotName: "",
@@ -44,9 +48,10 @@ const AppProvider: FC = ({ children }) => {
     defaultValues.isAuthenticated
   );
   const [isParking, setIsParking] = useState<boolean>(defaultValues.isParking);
-  const [startTime, setStartTime] = useState<Timestamp>(
+  const [startTime, setStartTime] = useState<Date | undefined>(
     defaultValues.startTime
   );
+  const [parkingHistory, setParkingHistory] = useState<Array<object>>([]);
   const [lotId, setLotId] = useState<string>(defaultValues.lotId);
   const [lotName, setLotName] = useState<string>(defaultValues.lotName);
 
@@ -74,7 +79,20 @@ const AppProvider: FC = ({ children }) => {
     if (auth.currentUser) {
       unsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
         setIsParking(doc.data()?.isParking);
-        setStartTime(doc.data()?.startTime);
+        setStartTime(doc.data()?.startTime.toDate());
+        setLotId(doc.data()?.lotId);
+      });
+    }
+    return unsub;
+  }, [auth.currentUser]);
+
+  // Keep track of updates to parking history
+  useEffect(() => {
+    let unsub;
+    if (auth.currentUser) {
+      unsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
+        setIsParking(doc.data()?.isParking);
+        setStartTime(doc.data()?.startTime.toDate());
         setLotId(doc.data()?.lotId);
       });
     }
@@ -90,6 +108,8 @@ const AppProvider: FC = ({ children }) => {
         setIsParking,
         startTime,
         setStartTime,
+        parkingHistory,
+        setParkingHistory,
         lotId,
         setLotId,
         lotName,

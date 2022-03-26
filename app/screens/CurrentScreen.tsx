@@ -9,36 +9,36 @@ import Colors from "../constants/Colors";
 type Props = {};
 
 const CurrentScreen = (props: Props) => {
+  const { isParking, startTime, lotId } = useGlobalContext();
+
   const [parkingTime, setParkingTime] = useState(0);
   const [counter, setCounter] = useState<NodeJS.Timer>();
   const [lotName, setLotName] = useState();
   const [lotRate, setLotRate] = useState(0);
 
-  const { isParking, startTime, lotId } = useGlobalContext();
-
   useEffect(() => {
     if (lotId)
       (async () => {
         const lotSnap = await getDoc(doc(db, "lots", lotId));
-        console.log(lotSnap.data());
         setLotName(lotSnap.data()?.name);
         setLotRate(lotSnap.data()?.rate);
       })();
   }, [lotId]);
 
   useEffect(() => {
-    console.log("yello");
+    if (isParking && startTime) {
+      console.log(startTime);
 
-    if (isParking) {
       const interval = setInterval(() => {
-        setParkingTime((parkingTime) => parkingTime + 1);
+        setParkingTime(
+          Math.floor((new Date().getTime() - startTime.getTime()) / 1000)
+        );
       }, 1000);
       setCounter(interval);
     } else if (counter) {
       clearInterval(counter);
     }
-    return clearInterval(counter);
-  }, [isParking]);
+  }, [isParking, startTime]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -52,14 +52,22 @@ const CurrentScreen = (props: Props) => {
               Started:{" "}
             </Text>
             <Text style={[Headers.h2, { color: Colors.primary }]}>
-              {startTime.toDate().toLocaleTimeString()}
+              {startTime?.toLocaleTimeString()}
             </Text>
           </View>
           <View style={styles.main}>
-            <Text style={styles.time}>{parkingTime}</Text>
+            <Text style={styles.time}>
+              {Math.floor(parkingTime / 3600)}:
+              {Math.floor((parkingTime % 3600) / 60)
+                .toString()
+                .padStart(2, "0")}
+              :{(parkingTime % 60).toString().padStart(2, "0")}
+            </Text>
             <View style={styles.money}>
-              <Text>{lotRate * parkingTime}</Text>
-              <Text>${lotRate}/hr</Text>
+              <Text style={[Headers.h2, styles.moneyText]}>
+                ${lotRate * Math.floor(parkingTime / 3600)}
+              </Text>
+              <Text style={[Headers.h2, styles.moneyText]}>${lotRate}/hr</Text>
             </View>
           </View>
         </View>
@@ -75,6 +83,11 @@ const styles = StyleSheet.create({
   lotName: { textAlign: "left", marginTop: 10 },
   startTime: { flexDirection: "row" },
   main: { flex: 1, justifyContent: "center", alignItems: "center" },
-  time: { fontSize: 40, color: Colors.white },
-  money: { flexDirection: "row", justifyContent: "space-between" },
+  time: { fontSize: 50, fontWeight: "600", color: Colors.white },
+  money: {
+    width: "50%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  moneyText: { color: Colors.lightGray },
 });
