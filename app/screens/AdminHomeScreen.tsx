@@ -1,7 +1,7 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { useFormik } from "formik";
-import { auth } from "../utils/Firebase";
+import { auth, db } from "../utils/Firebase";
 import ParkingAPI from "../api/ParkingAPI";
 import CustomButton from "../components/CustomButton";
 
@@ -11,6 +11,7 @@ const AdminHomeScreen = (props: Props) => {
   // TODO: Actually sign out
   const signOut = () => {
     console.log("signing out: TESTING!!!");
+    auth.signOut();
   };
   return (
     <SafeAreaView>

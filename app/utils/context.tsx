@@ -79,7 +79,7 @@ const AppProvider: FC = ({ children }) => {
     if (auth.currentUser) {
       unsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
         setIsParking(doc.data()?.isParking);
-        setStartTime(doc.data()?.startTime.toDate());
+        setStartTime(doc.data()?.startTime?.toDate());
         setLotId(doc.data()?.lotId);
       });
     }
@@ -92,7 +92,7 @@ const AppProvider: FC = ({ children }) => {
     if (auth.currentUser) {
       unsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
         setIsParking(doc.data()?.isParking);
-        setStartTime(doc.data()?.startTime.toDate());
+        setStartTime(doc.data()?.startTime?.toDate());
         setLotId(doc.data()?.lotId);
       });
     }
