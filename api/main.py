@@ -22,8 +22,10 @@ sys.path.append("..")
 from alpr.alpr import ALPR
 import pytesseract
 import ast
+from pydantic import BaseModel
 
 from test import software_dot_product
+import classes
 
 app = FastAPI()
 test_img = [[]]
@@ -69,8 +71,11 @@ async def Test():
     return "testing value"
 
 @app.post("/test_post")
-async def TestPost(val: int = 0):
-    print(val)
+async def TestPost(data: classes.Data):
+    return f"testing value {data.val}"
+
+@app.get("/test_param")
+async def TestParam(val: str):
     return f"testing value {val}"
 
 @app.post("/uploadfile/")
