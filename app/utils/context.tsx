@@ -16,6 +16,8 @@ type ContextState = {
   setIsAuthenticated: Dispatch<SetStateAction<boolean>>;
   isParking: boolean;
   setIsParking: Dispatch<SetStateAction<boolean>>;
+  isAdmin: boolean;
+  setIsAdmin: Dispatch<SetStateAction<boolean>>;
   startTime: Date | undefined;
   setStartTime: Dispatch<SetStateAction<Date | undefined>>;
   parkingHistory: Array<object>;
@@ -24,6 +26,8 @@ type ContextState = {
   setLotId: Dispatch<SetStateAction<string>>;
   lotName: string;
   setLotName: Dispatch<SetStateAction<string>>;
+  licensePlate: string;
+  setLicensePlate: Dispatch<SetStateAction<string>>;
 };
 
 const defaultValues: ContextState = {
@@ -31,6 +35,8 @@ const defaultValues: ContextState = {
   setIsAuthenticated: () => {},
   isParking: false,
   setIsParking: () => {},
+  isAdmin: false,
+  setIsAdmin: () => {},
   startTime: undefined,
   setStartTime: () => {},
   parkingHistory: [],
@@ -39,6 +45,8 @@ const defaultValues: ContextState = {
   setLotId: () => {},
   lotName: "",
   setLotName: () => {},
+  licensePlate: "",
+  setLicensePlate: () => {},
 };
 
 const AppContext = createContext<ContextState>(defaultValues);
@@ -48,12 +56,17 @@ const AppProvider: FC = ({ children }) => {
     defaultValues.isAuthenticated
   );
   const [isParking, setIsParking] = useState<boolean>(defaultValues.isParking);
+  const [isAdmin, setIsAdmin] = useState<boolean>(defaultValues.isAdmin);
   const [startTime, setStartTime] = useState<Date | undefined>(
     defaultValues.startTime
   );
   const [parkingHistory, setParkingHistory] = useState<Array<object>>([]);
   const [lotId, setLotId] = useState<string>(defaultValues.lotId);
   const [lotName, setLotName] = useState<string>(defaultValues.lotName);
+
+  const [licensePlate, setLicensePlate] = useState<string>(
+    defaultValues.licensePlate
+  );
 
   // Keep track of current user
   useEffect(() => {
@@ -81,6 +94,8 @@ const AppProvider: FC = ({ children }) => {
         setIsParking(doc.data()?.isParking);
         setStartTime(doc.data()?.startTime?.toDate());
         setLotId(doc.data()?.lotId);
+        setLicensePlate(doc.data()?.licensePlate);
+        setIsAdmin(doc.data()?.isAdmin);
       });
     }
     return unsub;
@@ -106,6 +121,8 @@ const AppProvider: FC = ({ children }) => {
         setIsAuthenticated,
         isParking,
         setIsParking,
+        isAdmin,
+        setIsAdmin,
         startTime,
         setStartTime,
         parkingHistory,
@@ -114,6 +131,8 @@ const AppProvider: FC = ({ children }) => {
         setLotId,
         lotName,
         setLotName,
+        licensePlate,
+        setLicensePlate,
       }}
     >
       {children}
