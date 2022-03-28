@@ -37,7 +37,7 @@ const HistoryItem = ({item, id}: Props) => {
       setEndTime(d2.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}));
     }
     if(item.duration && item.rate){
-      setCost((item.duration * item.rate).toFixed(2).toString());
+      setCost((item.duration / 60 * item.rate).toFixed(2).toString());
     }
   }, [item.start, item.duration, item.rate]);
 
@@ -48,8 +48,8 @@ const HistoryItem = ({item, id}: Props) => {
         <Text style={{color: Colors.darkWhite, ...styles.fontStyle}}>{date}</Text>
       </View>
       <View style={styles.rowStyle}>
-        <Text style={{color: Colors.primary, ...styles.fontStyle}}>${cost}</Text>
-        <Text style={{color: Colors.darkWhite, ...styles.fontStyle}}>{startTime} - {endTime}</Text>
+        <Text style={{color: Colors.primary, ...styles.fontStyle}}>${cost} {item.current ? " (Tentative)" : ""}</Text>
+        <Text style={{color: Colors.darkWhite, ...styles.fontStyle}}>{startTime} - {item.current ? "Now" : endTime}</Text>
       </View>
     </View>
   );

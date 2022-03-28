@@ -23,8 +23,11 @@ const HistoryScreen = (props: Props) => {
       <ScrollView>
         {
           parkingHistory.length > 0 ?
-          parkingHistory.map((history, idx)=>{
-            return <HistoryItem id={idx} item={history}/>
+          parkingHistory.sort((item1, item2)=>{
+            // sort by decreasing start date
+            return (item2.start?.seconds ?? 0) - (item1.start?.seconds ?? 0);
+          }).map((history, idx)=>{
+            return <HistoryItem id={idx} item={history} key={idx}/>
           })
           : <Text style={Headers.h2}>No Parking History Yet...</Text>
         }
