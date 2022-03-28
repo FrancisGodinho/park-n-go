@@ -110,6 +110,7 @@ const AppProvider: FC = ({ children }) => {
         setStartTime(doc.data()?.startTime?.toDate());
         setLotId(doc.data()?.lotId);
         setParkingHistory(doc.data()?.parkingHistory ?? []);
+        setParkingHistory(doc.data()?.parkingHistory);
       });
     }
     return unsub;
