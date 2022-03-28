@@ -90,6 +90,7 @@ const UserRegisterScreen = ({
           displayName: name,
           isParking: false,
           licensePlate: plate,
+          isAdmin: false,
         });
       })
       .catch((err) => setFirebaseError(err));

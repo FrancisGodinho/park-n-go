@@ -85,6 +85,7 @@ const AdminRegisterScreen = ({
           dateCreated: Timestamp.fromDate(new Date()),
           displayName: name,
           streak: 0,
+          isAdmin: true,
         });
       })
       .catch((err) => setFirebaseError(err));
