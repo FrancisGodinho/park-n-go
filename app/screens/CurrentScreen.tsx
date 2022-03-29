@@ -44,7 +44,7 @@ const CurrentScreen = (props: Props) => {
   return (
     <SafeAreaView style={styles.container}>
       {!isParking ? (
-        <ParkadeFinder/>
+        <ParkadeFinder />
       ) : (
         <View style={{ flex: 1 }}>
           <Text style={[Headers.h1, styles.lotName]}>{lotName}</Text>

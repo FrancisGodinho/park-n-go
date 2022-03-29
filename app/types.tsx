@@ -16,12 +16,14 @@ export type StackParamList = {
   AdminRegister: undefined;
   Login: undefined;
   Tabs: undefined;
+  AdminHome: undefined;
 };
 
 export type TabParamList = {
   History: undefined;
   Current: undefined;
   Profile: undefined;
+  AdminHome: undefined;
 };
 
 export type TabScreenProps<Screen extends keyof TabParamList> =

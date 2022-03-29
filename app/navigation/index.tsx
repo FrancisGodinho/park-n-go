@@ -18,6 +18,7 @@ import AdminRegisterScreen from "../screens/AdminRegisterScreen";
 import HistoryScreen from "../screens/HistoryScreen";
 import CurrentScreen from "../screens/CurrentScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import AdminHomeScreen from "../screens/AdminHomeScreen";
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -30,7 +31,7 @@ export default function Navigation() {
   const [isLoading, setIsLoading] = useState(true);
   const [timer, setTimer] = useState<NodeJS.Timeout>();
 
-  const { isAuthenticated, setIsAuthenticated } = useGlobalContext();
+  const { isAuthenticated, setIsAuthenticated, isAdmin } = useGlobalContext();
 
   let screens;
 
@@ -92,7 +93,15 @@ export default function Navigation() {
       </>
     );
   else
-    screens = (
+    screens = isAdmin ? (
+      <>
+        <Stack.Screen
+          name="AdminHome"
+          component={AdminHomeScreen}
+          options={screenOptions}
+        />
+      </>
+    ) : (
       <>
         <Stack.Screen
           name="Tabs"

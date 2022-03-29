@@ -1,48 +1,59 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { auth, db } from "../utils/Firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import ParkingAPI from "../api/ParkingAPI";
 import Headers from "../constants/Headers";
 import Colors from "../constants/Colors";
 import { useGlobalContext } from "../utils/context";
 import CustomButton from "../components/CustomButton";
+import CustomTextInput from "../components/CustomTextInput";
 
 type Props = {
   lotName: string | undefined;
 };
 
 const AdminHomeScreen = (props: Props) => {
-  // TODO; get actual lot name?
+  // TODO: get initial lot rate and capacity?
   const [lotRate, setLotRate] = useState(0);
   const [lotCapacity, setLotCapacity] = useState(0);
 
   const { parkingHistory, lotName, lotId } = useGlobalContext();
-  useEffect(() => {
-    if (lotId)
-      async () => {
-        const lotSnap = await getDoc(doc(db, "lots", lotId));
-        setLotRate(lotSnap.data()?.rate);
-      };
-  }, [lotId]);
+  // useEffect(() => {
+  //   if (lotId)
+  //     async () => {
+  //       const lotSnap = await getDoc(doc(db, "lots", lotId));
+  //       setLotRate(lotSnap.data()?.rate);
+  //     };
+  // }, [lotId]);
+  console.log("Lot name is: ");
+  console.log(props.lotName);
 
   const signOut = () => {
-    console.log("signing out: TESTING!!!");
-    console.log("Lot name is: ");
-    console.log(props.lotName);
     auth.signOut();
   };
 
-  // TODO: actually set rate!
+  // TODO: actually set rate! change it to user input instead of incrementing
   const setRate = () => {
     console.log("setting rate!!");
     setLotRate(lotRate + 1);
+    if (lotId)
+      async () => {
+        await updateDoc(doc(db, "lots", lotId), "rate", lotRate);
+      };
   };
-  // TODO: actually set rate!
+  // TODO: actually set capacity!
   const setCapacity = () => {
     console.log("setting capacity!!");
     setLotCapacity(lotCapacity + 1);
+
+    console.log("Lot id is");
+    console.log(lotId);
+    if (lotId)
+      async () => {
+        await updateDoc(doc(db, "lots", lotId), "capacity", lotCapacity);
+      };
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -74,13 +85,6 @@ const AdminHomeScreen = (props: Props) => {
 export default AdminHomeScreen;
 
 const styles = StyleSheet.create({
-  baseText: {
-    fontFamily: "Cochin",
-  },
-  titleText: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
   h1: { marginTop: 20, marginBottom: 10 },
   lotName: { textAlign: "left", marginTop: 10 },
   rate: {
@@ -105,17 +109,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    // backgroundColor: "blue",
     paddingTop: 10,
     paddingHorizontal: 10,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
-  //   bottomCont: {
-  //     flex: 1,
-  //     paddingTop: 10,
-  //     paddingHorizontal: 10,
-  //     borderTopLeftRadius: 15,
-  //     borderTopRightRadius: 15,
-  //   },
 });
