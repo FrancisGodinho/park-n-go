@@ -10,32 +10,32 @@ import { useGlobalContext } from "../utils/context";
 import CustomButton from "../components/CustomButton";
 import CustomTextInput from "../components/CustomTextInput";
 
-type Props = {
-  lotName: string | undefined;
-};
+type Props = {};
 
 const AdminHomeScreen = (props: Props) => {
-  // TODO: get initial lot rate and capacity?
-  const [lotRate, setLotRate] = useState(0);
+  const [lotRate, setLotRate] = useState(0); // TODO: get initial lot rate and capacity from db
   const [lotCapacity, setLotCapacity] = useState(0);
 
   const { parkingHistory, lotName, lotId } = useGlobalContext();
-  // useEffect(() => {
-  //   if (lotId)
-  //     async () => {
-  //       const lotSnap = await getDoc(doc(db, "lots", lotId));
-  //       setLotRate(lotSnap.data()?.rate);
-  //     };
-  // }, [lotId]);
-  console.log("Lot name is: ");
-  console.log(props.lotName);
+
+  // const formik = useFormik({
+  //   initialValues: {
+  //     rate: lotRate, // TODO: init this to value from database
+  //     capacity: lotCapacity, // TODO: init this to value from database
+  //   },
+  //   enableReinitialize: true,
+  //   // validationSchema: ProfileSchema,
+  //   onSubmit: (values) => {
+  //     console.log(values);
+  //   },
+  // });
 
   const signOut = () => {
     auth.signOut();
   };
 
   // TODO: actually set rate! change it to user input instead of incrementing
-  const setRate = () => {
+  const updateRate = () => {
     console.log("setting rate!!");
     setLotRate(lotRate + 1);
     if (lotId)
@@ -44,7 +44,7 @@ const AdminHomeScreen = (props: Props) => {
       };
   };
   // TODO: actually set capacity!
-  const setCapacity = () => {
+  const updateCapacity = (rate: number) => {
     console.log("setting capacity!!");
     setLotCapacity(lotCapacity + 1);
 
@@ -58,12 +58,21 @@ const AdminHomeScreen = (props: Props) => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={[Headers.h1, styles.h1]}>UBC Thunderbird Parkade</Text>
-      {/* <Text style={[Headers.h1, styles.lotName]}>{props.lotName}</Text> */}
       <View style={styles.container}>
         <View style={styles.rate}>
           <Text style={styles.rateText}>{"Rate:"}</Text>
           <Text style={[Headers.h2, styles.moneyText]}>${lotRate}/hr</Text>
-          <CustomButton disabled={false} text="set rate" onPress={setRate} />
+          <CustomButton disabled={false} text="set rate" onPress={updateRate} />
+          {/* <CustomTextInput
+            formik={formik}
+            isPass
+            name="rate"
+            placeholder="Credit Card"
+            value={formik.values.rate}
+            onSubmitEditing={() => {
+              updateRate(formik.values.rate);
+            }}
+          /> */}
         </View>
         <View style={styles.capacity}>
           <Text style={styles.capacityText}>{"Capacity:"}</Text>
@@ -73,7 +82,7 @@ const AdminHomeScreen = (props: Props) => {
           <CustomButton
             disabled={false}
             text="set capacity"
-            onPress={setCapacity}
+            onPress={updateCapacity}
           />
         </View>
         <CustomButton disabled={false} text="Sign Out" onPress={signOut} />
