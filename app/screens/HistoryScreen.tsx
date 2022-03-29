@@ -22,7 +22,7 @@ const HistoryScreen = (props: Props) => {
       <Text style={{marginBottom: 20, ...Headers.h1}}>Parking History</Text>
       <ScrollView>
         {
-          parkingHistory.length > 0 ?
+          parkingHistory && parkingHistory.length > 0 ?
           parkingHistory.sort((item1, item2)=>{
             // sort by decreasing start date
             return (item2.start?.seconds ?? 0) - (item1.start?.seconds ?? 0);
