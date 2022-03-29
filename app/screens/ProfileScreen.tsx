@@ -1,7 +1,7 @@
 import { SafeAreaView, StyleSheet, Text } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { auth, db } from "../utils/Firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { useGlobalContext } from "../utils/context";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -20,14 +20,21 @@ const ProfileSchema = Yup.object().shape({
 const ProfileScreen = (props: Props) => {
   const userEmail: string = `${auth.currentUser?.email}`; 
   const userID: string = `${auth.currentUser?.uid}`;
-  const docRef = doc(db, "users", userID);
-
   const { licensePlate } = useGlobalContext();
+
+  const [creditCard, setCreditCard] = useState<string>("");
+
+  useEffect(() => {
+    (async () => {
+      const userSnap = await getDoc(doc(db, "users", userID));
+      setCreditCard(userSnap.data()?.creditCard);
+    })();  
+  }, []);
 
   const formik = useFormik({
     initialValues: {
       plate: licensePlate,
-      creditCard: "", // TODO: init this to value from database
+      creditCard: creditCard, // TODO: init this to value from database
     },
     validationSchema: ProfileSchema,
     onSubmit: (values) => {
@@ -42,13 +49,14 @@ const ProfileScreen = (props: Props) => {
 
   const updatePlate = (plate: string) => {
     (async () => {
-      await updateDoc(docRef, "licensePlate", plate);
+      await updateDoc(doc(db, "users", userID), "licensePlate", plate);
     })();
   }
   
   const updateCreditCard = (creditCard: string) => {
     (async () => {
-      await updateDoc(docRef, "creditCard", creditCard);
+      console.log("hello");
+      await updateDoc(doc(db, "users", userID), "creditCard", creditCard);
     })();
   }
 
