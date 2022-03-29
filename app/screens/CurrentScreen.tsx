@@ -5,6 +5,7 @@ import Headers from "../constants/Headers";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../utils/Firebase";
 import Colors from "../constants/Colors";
+import ParkadeFinder from "../components/ParkadeFinder";
 
 type Props = {};
 
@@ -43,7 +44,7 @@ const CurrentScreen = (props: Props) => {
   return (
     <SafeAreaView style={styles.container}>
       {!isParking ? (
-        <Text style={Headers.h1}>No Parking</Text>
+        <ParkadeFinder/>
       ) : (
         <View style={{ flex: 1 }}>
           <Text style={[Headers.h1, styles.lotName]}>{lotName}</Text>
