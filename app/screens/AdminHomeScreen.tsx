@@ -88,9 +88,9 @@ const styles = StyleSheet.create({
   h1: { marginTop: 20, marginBottom: 10 },
   lotName: { textAlign: "left", marginTop: 10 },
   rate: {
-    width: "50%",
+    width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   moneyText: { color: Colors.lightGray },
   rateText: {
@@ -98,9 +98,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   capacity: {
-    width: "50%",
+    width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
+    marginTop: "5%",
   },
   capacityTextBody: { color: Colors.lightGray },
   capacityText: {
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingTop: 10,
+    paddingTop: 20,
     paddingHorizontal: 10,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
