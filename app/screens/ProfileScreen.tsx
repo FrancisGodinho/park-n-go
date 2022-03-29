@@ -1,6 +1,7 @@
 import { SafeAreaView, StyleSheet, Text } from "react-native";
 import React from "react";
 import { auth, db } from "../utils/Firebase";
+import { doc, updateDoc } from "firebase/firestore";
 import { useGlobalContext } from "../utils/context";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -13,21 +14,24 @@ type Props = {};
 
 const ProfileSchema = Yup.object().shape({
   plate: Yup.string().required("Required"),
-  creditCard: Yup.string().required("Required")
+  creditCard: Yup.string().min(6, "Must be 16 digits").required("Required")
 });
 
 const ProfileScreen = (props: Props) => {
   const userEmail: string = `${auth.currentUser?.email}`; 
+  const userID: string = `${auth.currentUser?.uid}`;
+  const docRef = doc(db, "users", userID);
+
   const { licensePlate } = useGlobalContext();
 
   const formik = useFormik({
     initialValues: {
       plate: licensePlate,
-      creditCard: "",
+      creditCard: "", // TODO: init this to value from database
     },
     validationSchema: ProfileSchema,
     onSubmit: (values) => {
-      console.log(values); // TODO: update the values in user profile in db?
+      console.log(values); 
     },
   });
   
@@ -36,8 +40,19 @@ const ProfileScreen = (props: Props) => {
     auth.signOut();
   };
 
+  const updatePlate = (plate: string) => {
+    (async () => {
+      await updateDoc(docRef, "licensePlate", plate);
+    })();
+  }
+  
+  const updateCreditCard = (creditCard: string) => {
+    (async () => {
+      await updateDoc(docRef, "creditCard", creditCard);
+    })();
+  }
+
   return (
-    //TODO: get credit card number, update the values in user profile
     <SafeAreaView style={styles.container}>
       <CustomHeader backDisabled={true} text={ userEmail } />
       <CustomTextInput
@@ -46,7 +61,7 @@ const ProfileScreen = (props: Props) => {
         name="plate" 
         placeholder="License Plate"
         value={formik.values.plate}
-        onSubmitEditing={() => {}}
+        onSubmitEditing={ updatePlate(formik.values.plate) }
       />
       <CustomTextInput
         formik={formik}
@@ -55,7 +70,7 @@ const ProfileScreen = (props: Props) => {
         name="creditCard" 
         placeholder="Credit Card"
         value={formik.values.creditCard}
-        onSubmitEditing={() => {}}
+        onSubmitEditing={ updateCreditCard(formik.values.creditCard) }
       />
       <CustomButton disabled={false} text="Sign Out" onPress={signOut}/>
     </SafeAreaView>
