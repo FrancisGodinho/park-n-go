@@ -14,7 +14,7 @@ type Props = {};
 
 const ProfileSchema = Yup.object().shape({
   plate: Yup.string().required("Required"),
-  creditCard: Yup.string().min(6, "Must be 16 digits").required("Required")
+  creditCard: Yup.string().min(16, "Must be 16 digits").required("Required")
 });
 
 const ProfileScreen = (props: Props) => {
@@ -36,6 +36,7 @@ const ProfileScreen = (props: Props) => {
       plate: licensePlate,
       creditCard: creditCard, // TODO: init this to value from database
     },
+    enableReinitialize: true,
     validationSchema: ProfileSchema,
     onSubmit: (values) => {
       console.log(values); 
@@ -69,7 +70,7 @@ const ProfileScreen = (props: Props) => {
         name="plate" 
         placeholder="License Plate"
         value={formik.values.plate}
-        onSubmitEditing={ updatePlate(formik.values.plate) }
+        onSubmitEditing={ () => {updatePlate(formik.values.plate)} }
       />
       <CustomTextInput
         formik={formik}
@@ -78,7 +79,7 @@ const ProfileScreen = (props: Props) => {
         name="creditCard" 
         placeholder="Credit Card"
         value={formik.values.creditCard}
-        onSubmitEditing={ updateCreditCard(formik.values.creditCard) }
+        onSubmitEditing={ () => {updateCreditCard(formik.values.creditCard)} }
       />
       <CustomButton disabled={false} text="Sign Out" onPress={signOut}/>
     </SafeAreaView>
