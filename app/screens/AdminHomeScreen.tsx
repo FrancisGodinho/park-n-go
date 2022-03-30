@@ -11,73 +11,65 @@ import CustomButton from "../components/CustomButton";
 import CustomTextInput from "../components/CustomTextInput";
 
 type Props = {};
+const LOT_ID = "jw7d1mNE2Cw1mTG0tzzH";
 
 const AdminHomeScreen = (props: Props) => {
-  const [lotRate, setLotRate] = useState(0); // TODO: get initial lot rate and capacity from db
+  const [lotRate, setLotRate] = useState(0);
   const [lotCapacity, setLotCapacity] = useState(0);
+  const [curNumCars, setCurNumCars] = useState(0);
 
-  const { parkingHistory, lotName, lotId } = useGlobalContext();
+  // Note that lotId is null because the admin is not associated with any parking lot
+  // Currently using a fixed LOT_ID for this admin
+  const { lotName, lotId, setLotName } = useGlobalContext();
 
-  // const formik = useFormik({
-  //   initialValues: {
-  //     rate: lotRate, // TODO: init this to value from database
-  //     capacity: lotCapacity, // TODO: init this to value from database
-  //   },
-  //   enableReinitialize: true,
-  //   // validationSchema: ProfileSchema,
-  //   onSubmit: (values) => {
-  //     console.log(values);
-  //   },
-  // });
+  useEffect(() => {
+    (async () => {
+      const lotSnap = await getDoc(doc(db, "lots", LOT_ID));
+      setLotName(lotSnap.data()?.name);
+      setLotRate(lotSnap.data()?.rate);
+      setLotCapacity(lotSnap.data()?.capacity);
+      setCurNumCars(lotSnap.data()?.currentNumCars);
+      console.log("lot rate is: " + lotSnap.data()?.rate);
+      console.log("lot capacity is: " + lotSnap.data()?.capacity);
+    })();
+  }, [LOT_ID]);
 
   const signOut = () => {
     auth.signOut();
   };
 
+  // Have to increment twice initially to update the rate or capacity in database?
   // TODO: actually set rate! change it to user input instead of incrementing
-  const updateRate = () => {
-    console.log("setting rate!!");
+  const updateRate = (newRate: number) => {
+    console.log("Setting rate!!");
     setLotRate(lotRate + 1);
-    if (lotId)
-      async () => {
-        await updateDoc(doc(db, "lots", lotId), "rate", lotRate);
-      };
+    (async () => {
+      console.log("Updateing rate in database");
+      await updateDoc(doc(db, "lots", LOT_ID), "rate", lotRate);
+    })();
   };
-  // TODO: actually set capacity!
-  const updateCapacity = (rate: number) => {
-    console.log("setting capacity!!");
+  // TODO: actually set capacity! change it to user input instead of incrementing
+  const updateCapacity = (newCapacity: number) => {
+    console.log("Setting capacity!!");
     setLotCapacity(lotCapacity + 1);
-
-    console.log("Lot id is");
-    console.log(lotId);
-    if (lotId)
-      async () => {
-        await updateDoc(doc(db, "lots", lotId), "capacity", lotCapacity);
-      };
+    (async () => {
+      console.log("Updateing capacity in database");
+      await updateDoc(doc(db, "lots", LOT_ID), "capacity", lotCapacity);
+    })();
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={[Headers.h1, styles.h1]}>UBC Thunderbird Parkade</Text>
+      <Text style={[Headers.h1, styles.h1]}>{lotName}</Text>
       <View style={styles.container}>
         <View style={styles.rate}>
           <Text style={styles.rateText}>{"Rate:"}</Text>
           <Text style={[Headers.h2, styles.moneyText]}>${lotRate}/hr</Text>
           <CustomButton disabled={false} text="set rate" onPress={updateRate} />
-          {/* <CustomTextInput
-            formik={formik}
-            isPass
-            name="rate"
-            placeholder="Credit Card"
-            value={formik.values.rate}
-            onSubmitEditing={() => {
-              updateRate(formik.values.rate);
-            }}
-          /> */}
         </View>
         <View style={styles.capacity}>
           <Text style={styles.capacityText}>{"Capacity:"}</Text>
           <Text style={[Headers.h2, styles.capacityTextBody]}>
-            {lotCapacity}
+            {curNumCars}/{lotCapacity}
           </Text>
           <CustomButton
             disabled={false}
