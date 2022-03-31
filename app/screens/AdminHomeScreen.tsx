@@ -118,7 +118,7 @@ const AdminHomeScreen = (props: Props) => {
         <View style={styles.longitude}>
           <Text style={styles.itemText}>{"Longitude:"}</Text>
           <Text style={[Headers.h2, styles.itemTextBody]}>{lotLongitude}</Text>
-          {/* <CustomTextInput
+          {<CustomTextInput
             formik={formik}
             name="longitude"
             placeholder={lotLongitude.toString()}
@@ -126,7 +126,7 @@ const AdminHomeScreen = (props: Props) => {
             onSubmitEditing={() => {
               updateLongitude(formik.values.longitude);
             }}
-          /> */}
+          /> }
         </View>
         <View style={styles.latitude}>
           <Text style={styles.itemText}>{"Latitude:"}</Text>
@@ -186,5 +186,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
+    backgroundColor: Colors.black,
   },
 });

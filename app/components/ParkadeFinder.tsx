@@ -21,8 +21,8 @@ const ParkadeFinder = (props: Props) => {
       newParkades.push({
         title: data.name,
         coordinate:{
-          longitude: data.longitude,
-          latitude: data.latitude,
+          longitude: parseFloat(data.longitude),
+          latitude: parseFloat(data.latitude),
         },
         description: "Rate: $" + data.rate + " per hour",
       });
