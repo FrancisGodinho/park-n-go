@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { auth, db } from "../utils/Firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import ParkingAPI from "../api/ParkingAPI";
 import Headers from "../constants/Headers";
 import Colors from "../constants/Colors";
@@ -17,8 +17,8 @@ const AdminHomeScreen = (props: Props) => {
   const [lotRate, setLotRate] = useState(0);
   const [lotCapacity, setLotCapacity] = useState(0);
   const [curNumCars, setCurNumCars] = useState(0);
-  const [lotLongitude, setLotLongitude] = useState(0);
-  const [lotLatitude, setLotLatitude] = useState(0);
+  const [lotLongitude, setLotLongitude] = useState("");
+  const [lotLatitude, setLotLatitude] = useState("");
 
   // Note that lotId is null because the admin is not associated with any parking lot
   // Currently using a fixed LOT_ID for this admin
@@ -77,21 +77,29 @@ const AdminHomeScreen = (props: Props) => {
 
   // Problem: have to enter twice to set any value
   // Also, the CustomTextInput field is invisible
-  const updateLongitude = (newLongitude: number) => {
+  const updateLongitude = (newLongitude: string) => {
     console.log("Setting longitude!!");
     setLotLongitude(newLongitude);
     (async () => {
       console.log("Updateing longitude in database");
-      await updateDoc(doc(db, "lots", LOT_ID), "longitude", lotLongitude);
+      await updateDoc(
+        doc(db, "lots", LOT_ID),
+        "longitude",
+        parseFloat(formik.values.longitude)
+      );
     })();
   };
 
-  const updateLatitude = (newLatitude: number) => {
+  const updateLatitude = (newLatitude: string) => {
     console.log("Setting latitude!!");
     setLotLatitude(newLatitude);
     (async () => {
       console.log("Updateing latitude in database");
-      await updateDoc(doc(db, "lots", LOT_ID), "latitude", lotLatitude);
+      await updateDoc(
+        doc(db, "lots", LOT_ID),
+        "latitude",
+        parseFloat(formik.values.latitude)
+      );
     })();
   };
 
@@ -118,28 +126,35 @@ const AdminHomeScreen = (props: Props) => {
         <View style={styles.longitude}>
           <Text style={styles.itemText}>{"Longitude:"}</Text>
           <Text style={[Headers.h2, styles.itemTextBody]}>{lotLongitude}</Text>
-          {<CustomTextInput
-            formik={formik}
-            name="longitude"
-            placeholder={lotLongitude.toString()}
-            value={formik.values.longitude}
-            onSubmitEditing={() => {
-              updateLongitude(formik.values.longitude);
-            }}
-          /> }
+          {
+            <CustomTextInput
+              formik={formik}
+              name="longitude"
+              // placeholder={lotLongitude.toString()}
+              placeholder={""}
+              value={formik.values.longitude}
+              // keyboardType="numeric"
+              onSubmitEditing={() => {
+                updateLongitude(formik.values.longitude);
+              }}
+            />
+          }
         </View>
         <View style={styles.latitude}>
           <Text style={styles.itemText}>{"Latitude:"}</Text>
           <Text style={[Headers.h2, styles.itemTextBody]}>{lotLatitude}</Text>
-          {/* <CustomTextInput
+          <CustomTextInput
+            editable
             formik={formik}
             name="latitude"
-            placeholder="latitude"
+            // placeholder="latitude"
+            placeholder={""}
             value={formik.values.latitude}
+            // keyboardType="numeric"
             onSubmitEditing={() => {
               updateLatitude(formik.values.latitude);
             }}
-          /> */}
+          />
         </View>
         <CustomButton disabled={false} text="Sign Out" onPress={signOut} />
       </View>
