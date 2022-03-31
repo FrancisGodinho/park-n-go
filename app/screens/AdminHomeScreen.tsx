@@ -41,9 +41,8 @@ const AdminHomeScreen = (props: Props) => {
     },
     enableReinitialize: true,
     // validationSchema: ProfileSchema,
-    onSubmit: (values, actions) => {
+    onSubmit: (values) => {
       console.log(values);
-      actions.resetForm({});
     },
   });
 
@@ -56,9 +55,6 @@ const AdminHomeScreen = (props: Props) => {
       setCurNumCars(lotSnap.data()?.currentNumCars);
       setLotLongitude(lotSnap.data()?.longitude);
       setLotLatitude(lotSnap.data()?.latitude);
-
-      console.log("lot rate is: " + lotSnap.data()?.rate);
-      console.log("lot capacity is: " + lotSnap.data()?.capacity);
     })();
   }, [LOT_ID]);
 
@@ -185,7 +181,6 @@ const AdminHomeScreen = (props: Props) => {
               value={formik.values.latitude}
               onSubmitEditing={() => {
                 updateLatitude(formik.values.latitude);
-                formik.resetForm();
               }}
             />
           </View>
