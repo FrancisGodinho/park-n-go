@@ -26,9 +26,14 @@ void g_blur(vector<vector<int>>& img, vector<vector<int>>& out, vector<int> win)
 	int p, q;
 	char res[32];
 	int curr_img[win_len * win_len];
-	cout << img.size() << endl;
-	cout << img[0].size() << endl;
+	//cout << img.size() << endl;
+	//cout << img[0].size() << endl;
 	curr_img[0] = img[0][0];
+    fstream accel;
+    fstream accel_write;
+	// open the kernel module
+    accel.open("/dev/cpen391_accel_erator", ios::binary | ios::in | ios::out);
+   	accel_write.open("/dev/cpen391_accel_erator", ios::binary | ios::in | ios::out);
 	for(i = 0; i < img_height - win_len + 1; i++){
 		for(j = 0; j < img_width - win_len + 1; j++){
 			// flatten the array
@@ -38,9 +43,6 @@ void g_blur(vector<vector<int>>& img, vector<vector<int>>& out, vector<int> win)
 				}
 			}
 			char o[8 * win_len * win_len] = {0}; // array to write to 1gb dram
-    		fstream accel;
-			// open the kernel module
-    		accel.open("/dev/cpen391_accel_erator", ios::binary | ios::in | ios::out);
     		setup_arr(win, curr_img, o, win_len * win_len); // create o
 #ifdef DEBUG_PRINT
 			cout << "printing curr_img " << endl;
@@ -56,15 +58,18 @@ void g_blur(vector<vector<int>>& img, vector<vector<int>>& out, vector<int> win)
 				cout << (int) o[p] << ", ";
 			} cout << endl;
 #endif
-			accel.write(o, 8 * win_len * win_len); // write to 1gb dram
-     		accel.read(o, 25); // read result of hw accleration
+			accel_write.write(o, 8 * win_len * win_len); // write to 1gb dram
+			accel_write.flush();
+			//accel.write(o, 8 * win_len * win_len); // write to 1gb dram
+     		accel.read(o, 9000); // read result of hw accleration
 #ifdef DEBUG_PRINT
 			cout << "result of dot product is " << (int)o[0] << endl;
 #endif
 			out[i][j] = o[0] | (o[1] << 8) | (o[2] << 16) | (o[3] << 24); // write the result to out array
-            accel.close(); // close the kernel module
 		}
 	}
+            accel.close(); // close the kernel module
+            accel_write.close(); // close the kernel module
 }
 
 
