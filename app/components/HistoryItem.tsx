@@ -42,7 +42,7 @@ const HistoryItem = ({ item, id }: Props) => {
       );
     }
     if (item.duration && item.rate) {
-      setCost(((item.duration / 60) * item.rate).toFixed(2).toString());
+      setCost(((item.duration / 3600) * item.rate).toFixed(2).toString());
     }
   }, [item.start, item.duration, item.rate]);
 

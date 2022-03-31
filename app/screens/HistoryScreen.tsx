@@ -27,6 +27,7 @@ const HistoryScreen = (props: Props) => {
             // sort by decreasing start date
             return (item2.start?.seconds ?? 0) - (item1.start?.seconds ?? 0);
           }).map((history, idx)=>{
+            history["duration"] = history.end - history.start;
             return <HistoryItem id={idx} item={history} key={idx}/>
           })
           : <Text style={Headers.h2}>No Parking History Yet...</Text>
