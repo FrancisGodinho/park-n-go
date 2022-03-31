@@ -28,7 +28,7 @@ const CurrentScreen = (props: Props) => {
 
   useEffect(() => {
     if (isParking && startTime) {
-      console.log(startTime);
+      console.log("hi", isParking, startTime);
 
       const interval = setInterval(() => {
         setParkingTime(
@@ -37,8 +37,10 @@ const CurrentScreen = (props: Props) => {
       }, 1000);
       setCounter(interval);
     } else if (counter) {
+      console.log("yello");
       clearInterval(counter);
     }
+    return () => clearInterval(counter);
   }, [isParking, startTime]);
 
   return (

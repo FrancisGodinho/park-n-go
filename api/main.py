@@ -2,9 +2,11 @@ from itertools import product
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import firestore
 import os
+
 import subprocess
 from datetime import datetime
 from typing import List
@@ -31,12 +33,10 @@ app = FastAPI()
 test_img = [[]]
 
 # Firebase initialization
-# Use the application default credentials
-#project_id = ''
-#cred = credentials.Certificate('./firebasePrivateKey.json')
-#firebase_admin.initialize_app(cred)
-
-#db = firestore.client()
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'cpen-391-ab53e-4274a32d414e.json'
+if not firebase_admin._apps:
+    firebase_admin.initialize_app()
+db = firestore.client()
 
 # origins = [
 #    "http://localhost",
@@ -65,6 +65,28 @@ def string_to_numpy(str):
     lst = ast.literal_eval(str)
     arr = np.array(lst, dtype='float64')
     return arr
+
+def alert_database(lpText):
+    userDocs = list(db.collection('users').where('licensePlate', '==', lpText).stream())
+    if len(userDocs):
+        id = userDocs[0].id
+        userDoc = userDocs[0].to_dict()
+        # Check if user is already parked
+        if userDoc['isParking']:
+            # End parking
+            rate = db.collection('lots').document(userDoc['lotId']).get().to_dict()['rate']
+            db.collection('users').document(id).update(
+                {'isParking': False, 'startTime': int(datetime.now().timestamp()*1000), 'lotId': '', 'parkingHistory': firestore.ArrayUnion(
+                    [{'startTime': userDoc['startTime'], 'endTime': int(datetime.now().timestamp()*1000), 'lotId': userDoc['lotId'], 'rate': rate}]
+                )}
+            )
+        else:
+            # Start parking
+            db.collection('users').document(id).update(
+                {'isParking': True, 'startTime': int(datetime.now().timestamp()*1000), 'lotId': 'jw7d1mNE2Cw1mTG0tzzH' }
+            )
+    else:
+        print("Could not find user with license plate")
 
 @app.get("/test")
 async def Test():
@@ -156,6 +178,7 @@ async def acceleration_result(file: UploadFile = File(...)):
         # OCR the license plate
         options = alpr.build_tesseract_options(psm=13)
         lpText = pytesseract.image_to_string(lp, config=options)
+        alert_database(lpText)
         print(f"hardware says: {lpText}")
         alpr.debug_imshow("License Plate", lp)
     if lpText is None or lpText == '':
