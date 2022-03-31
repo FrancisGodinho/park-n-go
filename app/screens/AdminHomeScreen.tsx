@@ -14,8 +14,8 @@ type Props = {};
 const LOT_ID = "jw7d1mNE2Cw1mTG0tzzH";
 
 const AdminHomeScreen = (props: Props) => {
-  const [lotRate, setLotRate] = useState(0);
-  const [lotCapacity, setLotCapacity] = useState(0);
+  const [lotRate, setLotRate] = useState("");
+  const [lotCapacity, setLotCapacity] = useState("");
   const [curNumCars, setCurNumCars] = useState(0);
   const [lotLongitude, setLotLongitude] = useState("");
   const [lotLatitude, setLotLatitude] = useState("");
@@ -26,6 +26,8 @@ const AdminHomeScreen = (props: Props) => {
 
   const formik = useFormik({
     initialValues: {
+      rate: lotRate,
+      capacity: lotCapacity,
       longitude: lotLongitude,
       latitude: lotLatitude,
     },
@@ -57,21 +59,29 @@ const AdminHomeScreen = (props: Props) => {
 
   // Have to increment twice initially to update the rate or capacity in database?
   // TODO: actually set rate! change it to user input instead of incrementing
-  const updateRate = (newRate: number) => {
+  const updateRate = (newRate: string) => {
     console.log("Setting rate!!");
-    setLotRate(lotRate + 1);
+    setLotRate(newRate);
     (async () => {
       console.log("Updateing rate in database");
-      await updateDoc(doc(db, "lots", LOT_ID), "rate", lotRate);
+      await updateDoc(
+        doc(db, "lots", LOT_ID),
+        "rate",
+        parseFloat(formik.values.rate)
+      );
     })();
   };
   // TODO: actually set capacity! change it to user input instead of incrementing
-  const updateCapacity = (newCapacity: number) => {
+  const updateCapacity = (newCapacity: string) => {
     console.log("Setting capacity!!");
-    setLotCapacity(lotCapacity + 1);
+    setLotCapacity(newCapacity);
     (async () => {
       console.log("Updateing capacity in database");
-      await updateDoc(doc(db, "lots", LOT_ID), "capacity", lotCapacity);
+      await updateDoc(
+        doc(db, "lots", LOT_ID),
+        "capacity",
+        parseFloat(formik.values.capacity)
+      );
     })();
   };
 
@@ -110,17 +120,39 @@ const AdminHomeScreen = (props: Props) => {
         <View style={styles.rate}>
           <Text style={styles.itemText}>{"Rate:"}</Text>
           <Text style={[Headers.h2, styles.itemTextBody]}>${lotRate}/hr</Text>
-          <CustomButton disabled={false} text="set rate" onPress={updateRate} />
+          {/* <CustomButton disabled={false} text="set rate" onPress={updateRate} /> */}
+          <CustomTextInput
+            formik={formik}
+            name="rate"
+            style={styles.customInput}
+            placeholder={""}
+            value={formik.values.rate}
+            // keyboardType="numeric"
+            onSubmitEditing={() => {
+              updateRate(formik.values.rate);
+            }}
+          />
         </View>
         <View style={styles.capacity}>
           <Text style={styles.itemText}>{"Capacity:"}</Text>
           <Text style={[Headers.h2, styles.itemTextBody]}>
             {curNumCars}/{lotCapacity}
           </Text>
-          <CustomButton
+          {/* <CustomButton
             disabled={false}
             text="set capacity"
             onPress={updateCapacity}
+          /> */}
+          <CustomTextInput
+            formik={formik}
+            name="capacity"
+            style={styles.customInput}
+            placeholder={""}
+            value={formik.values.capacity}
+            // keyboardType="numeric"
+            onSubmitEditing={() => {
+              updateCapacity(formik.values.capacity);
+            }}
           />
         </View>
         <View style={styles.longitude}>
@@ -130,7 +162,7 @@ const AdminHomeScreen = (props: Props) => {
             <CustomTextInput
               formik={formik}
               name="longitude"
-              // placeholder={lotLongitude.toString()}
+              style={styles.customInput}
               placeholder={""}
               value={formik.values.longitude}
               // keyboardType="numeric"
@@ -147,10 +179,10 @@ const AdminHomeScreen = (props: Props) => {
             editable
             formik={formik}
             name="latitude"
-            // placeholder="latitude"
+            style={styles.customInput}
             placeholder={""}
             value={formik.values.latitude}
-            // keyboardType="numeric"
+            // keyboardType="default"
             onSubmitEditing={() => {
               updateLatitude(formik.values.latitude);
             }}
@@ -202,5 +234,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
     backgroundColor: Colors.black,
+  },
+  customInput: {
+    paddingRight: "20%",
   },
 });
