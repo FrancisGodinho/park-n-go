@@ -156,49 +156,7 @@ static int __init accel_driver_init(void) {
       goto error_create_kobj;
     }
     *((unsigned int *)(SDRAMC_virtual_address + FPGAPORTRST)) = 0xFFFF;
-    
-	// Calculate required memory to store an Image
-    image_memory_size = 64; //image_width * image_height * pixel_size;
-
-    // Allocate uncached buffers
-    // The dma_alloc_coherent() function allocates non-cached physically
-    // contiguous memory. Accesses to the memory by the CPU are the same
-    // as a cache miss when the cache is used. The CPU does not have to
-    // invalidate or flush the cache which can be time consuming.
-    virtual_buff0 = dma_alloc_coherent(
-        NULL,
-        image_memory_size,
-        &(physical_buff0), //address to use from image writer in fpga
-        GFP_KERNEL);
-
-    if (virtual_buff0 == NULL) {
-        printk(KERN_INFO DRIVER_NAME": Allocation of non-cached buffer 0 failed\n");
-        return -1;
-    }
-
-    virtual_buff1 = dma_alloc_coherent(
-        NULL,
-        image_memory_size,
-        &(physical_buff1), //address to use from image writer in fpga
-        GFP_KERNEL);
-
-    if (virtual_buff1 == NULL) {
-        printk(KERN_INFO DRIVER_NAME": Allocation of non-cached buffer 1 failed\n");
-        return -1;
-    }
-    
-    int image_writer_base;
-    int image_writer_span;
-    image_writer_base = AVALON_ACCEL_BASE;
-    image_writer_span = AVALON_ACCEL_SPAN;
-	// Ioremap FPGA memory //
-    // To ioremap the slave port of the image writer in the FPGA so we can access from kernel space
-    image_writer =
-        ioremap(HPS_FPGA_BRIDGE_BASE + image_writer_base, image_writer_span);
-    if (image_writer == NULL) {
-        printk(KERN_INFO DRIVER_NAME": Error doing FPGA camera ioremap\n");
-        return -1;
-    }
+	virtual_buff0 = virtual_buff1 = NULL;
 
     return 0;
 
@@ -214,14 +172,7 @@ error_class_create:
 }
 
 static void __exit accel_driver_exit(void) {
-    printk("Exiting accel module\n"); 
-	dma_free_coherent(NULL, image_memory_size, virtual_buff0,
-      physical_buff0);
-    dma_free_coherent(NULL, image_memory_size, virtual_buff1,
-      physical_buff1);
-    iounmap(image_writer);
-    
-	device_destroy(class, MKDEV(majorNumber, MINOR_RGBG));
+    device_destroy(class, MKDEV(majorNumber, MINOR_RGBG));
     class_unregister(class);
     class_destroy(class);
     unregister_chrdev(majorNumber, DRIVER_NAME);
@@ -232,14 +183,18 @@ static void __exit accel_driver_exit(void) {
 
 //-----CHAR DEVICE DRIVER SPECIFIC FUNCTIONS-----//
 static int accel_open(struct inode *inodep, struct file *filep) {
-    printk("We are in opening accel\n");
+    int image_writer_base;
+    int image_writer_span;
     int pixel_size;
     int counter;
     //Findout which device is being open using the minor numbers
     int dev_number = iminor(filep->f_path.dentry->d_inode);
+	printk("Is Opening accel\n");
 
     // Establish image_writer and pixel_size based on image_type
     if (dev_number == MINOR_RGBG) {
+        image_writer_base = AVALON_ACCEL_BASE;
+        image_writer_span = AVALON_ACCEL_SPAN;
         pixel_size = sizeof(u8) * 4;
     } else {
         printk(KERN_INFO DRIVER_NAME": Some error with the minor numbers!!\n");
@@ -251,14 +206,57 @@ static int accel_open(struct inode *inodep, struct file *filep) {
     //  return -1;
     //}
 
+    // Ioremap FPGA memory //
+    // To ioremap the slave port of the image writer in the FPGA so we can access from kernel space
+    image_writer =
+        ioremap(HPS_FPGA_BRIDGE_BASE + image_writer_base, image_writer_span);
+    if (image_writer == NULL) {
+        printk(KERN_INFO DRIVER_NAME": Error doing FPGA camera ioremap\n");
+        return -1;
+    }
 
+    // Calculate required memory to store an Image
+    image_memory_size = 64; //image_width * image_height * pixel_size;
 
+    // Allocate uncached buffers
+    // The dma_alloc_coherent() function allocates non-cached physically
+    // contiguous memory. Accesses to the memory by the CPU are the same
+    // as a cache miss when the cache is used. The CPU does not have to
+    // invalidate or flush the cache which can be time consuming.
+	if (virtual_buff0 == NULL) {
+    	virtual_buff0 = dma_alloc_coherent(
+    	    NULL,
+    	    image_memory_size,
+    	    &(physical_buff0), //address to use from image writer in fpga
+    	    GFP_KERNEL);
+
+    	if (virtual_buff0 == NULL) {
+    	    printk(KERN_INFO DRIVER_NAME": Allocation of non-cached buffer 0 failed\n");
+    	    return -1;
+    	}
+	}
+
+	if (virtual_buff1 == NULL) {
+    	virtual_buff1 = dma_alloc_coherent(
+    	    NULL,
+    	    image_memory_size,
+    	    &(physical_buff1), //address to use from image writer in fpga
+    	    GFP_KERNEL);
+
+    	if (virtual_buff1 == NULL) {
+    	    printk(KERN_INFO DRIVER_NAME": Allocation of non-cached buffer 1 failed\n");
+    	    return -1;
+    	}
+	}
     is_open = 1;
+	printk("Is Opening accel, done\n");
     return 0;
 }
 
 // TODO
 static ssize_t accel_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
+	printk("We are in the write accel\n");
+    int i;
     unsigned long ret = copy_from_user(virtual_buff0, buffer, len/2);
     if (ret != 0){printk("UHOH1\n");}
     ret = copy_from_user(virtual_buff1, buffer+len/2, len/2);
@@ -267,10 +265,26 @@ static ssize_t accel_write(struct file *filep, const char *buffer, size_t len, l
 }
 
 static ssize_t accel_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
-    unsigned int res;
+	printk("We are in the read accel\n");
+	unsigned int res;
+    volatile int i;
+    i = 0;
+	len = 25;
+
     iowrite32(physical_buff0, image_writer + ACCEL_ADDR0);
     iowrite32(physical_buff1, image_writer + ACCEL_ADDR1);
-    iowrite32(25, image_writer + ACCEL_N);
+    iowrite32(len, image_writer + ACCEL_N);
+
+   // res = ioread32(image_writer + ACCEL_ADDR0);
+   // res = ioread32(image_writer + ACCEL_ADDR0);
+   // 
+   // res = ioread32(image_writer + ACCEL_ADDR1);
+   // res = ioread32(image_writer + ACCEL_ADDR1);
+   // 
+   // res = ioread32(image_writer + ACCEL_N);
+   // res = ioread32(image_writer + ACCEL_N);
+
+   // res = ioread32(image_writer + ACCEL_SUM);
     res = ioread32(image_writer + ACCEL_SUM);
 
 	buffer[0] = (res & 0xFF);
@@ -289,11 +303,16 @@ static int camera_release(struct inode *inodep, struct file *filep) {
         printk(KERN_INFO DRIVER_NAME": Release ACCEL\n");
     }
 
-    //if (is_open == 0) {
-    //  printk(KERN_INFO DRIVER_NAME": Error releasing: this device is not open!!\n");
-    //  return -1;
-    //}
+    if (is_open == 0) {
+      printk(KERN_INFO DRIVER_NAME": Error releasing: this device is not open!!\n");
+      return -1;
+    }
 
+    dma_free_coherent(NULL, image_memory_size, virtual_buff0,
+      physical_buff0);
+    dma_free_coherent(NULL, image_memory_size, virtual_buff1,
+      physical_buff1);
+    iounmap(image_writer);
 
     is_open = 0;
 
