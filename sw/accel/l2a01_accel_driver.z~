@@ -187,10 +187,6 @@ static int __init accel_driver_init(void) {
         return -1;
     }
     
-    int image_writer_base;
-    int image_writer_span;
-    image_writer_base = AVALON_ACCEL_BASE;
-    image_writer_span = AVALON_ACCEL_SPAN;
 	// Ioremap FPGA memory //
     // To ioremap the slave port of the image writer in the FPGA so we can access from kernel space
     image_writer =
@@ -233,6 +229,8 @@ static void __exit accel_driver_exit(void) {
 //-----CHAR DEVICE DRIVER SPECIFIC FUNCTIONS-----//
 static int accel_open(struct inode *inodep, struct file *filep) {
     printk("We are in opening accel\n");
+    int image_writer_base;
+    int image_writer_span;
     int pixel_size;
     int counter;
     //Findout which device is being open using the minor numbers
@@ -240,6 +238,8 @@ static int accel_open(struct inode *inodep, struct file *filep) {
 
     // Establish image_writer and pixel_size based on image_type
     if (dev_number == MINOR_RGBG) {
+        image_writer_base = AVALON_ACCEL_BASE;
+        image_writer_span = AVALON_ACCEL_SPAN;
         pixel_size = sizeof(u8) * 4;
     } else {
         printk(KERN_INFO DRIVER_NAME": Some error with the minor numbers!!\n");
@@ -252,6 +252,7 @@ static int accel_open(struct inode *inodep, struct file *filep) {
     //}
 
 
+    printk("We are done opening accel\n");
 
     is_open = 1;
     return 0;
@@ -259,6 +260,8 @@ static int accel_open(struct inode *inodep, struct file *filep) {
 
 // TODO
 static ssize_t accel_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
+    printk("We are in write accel\n");
+	int i;
     unsigned long ret = copy_from_user(virtual_buff0, buffer, len/2);
     if (ret != 0){printk("UHOH1\n");}
     ret = copy_from_user(virtual_buff1, buffer+len/2, len/2);
@@ -267,11 +270,31 @@ static ssize_t accel_write(struct file *filep, const char *buffer, size_t len, l
 }
 
 static ssize_t accel_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
+    printk("We are in read accel\n");
     unsigned int res;
+    volatile int i;
+    i = 0;
+	len = 25;
+
+    printk(" first iowrite, read\n");
     iowrite32(physical_buff0, image_writer + ACCEL_ADDR0);
+    printk("We are done first iowrite, read\n");
     iowrite32(physical_buff1, image_writer + ACCEL_ADDR1);
-    iowrite32(25, image_writer + ACCEL_N);
+    iowrite32(len, image_writer + ACCEL_N);
+
+   // res = ioread32(image_writer + ACCEL_ADDR0);
+   // res = ioread32(image_writer + ACCEL_ADDR0);
+   // 
+   // res = ioread32(image_writer + ACCEL_ADDR1);
+   // res = ioread32(image_writer + ACCEL_ADDR1);
+   // 
+   // res = ioread32(image_writer + ACCEL_N);
+   // res = ioread32(image_writer + ACCEL_N);
+
+   // res = ioreae32(image_writer + ACCEL_SUM);
+    printk("before ioread, read\n");
     res = ioread32(image_writer + ACCEL_SUM);
+    printk("ioread, read\n");
 
 	buffer[0] = (res & 0xFF);
 	buffer[1] = (res & 0xFF00) >> 8;
