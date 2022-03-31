@@ -10,6 +10,7 @@ import React, {
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "./Firebase";
+import { LogBox } from "react-native";
 
 type ContextState = {
   isAuthenticated: boolean;
@@ -92,7 +93,9 @@ const AppProvider: FC = ({ children }) => {
     if (auth.currentUser) {
       unsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
         setIsParking(doc.data()?.isParking);
-        setStartTime(doc.data()?.startTime?.toDate());
+        setStartTime(
+          doc.data()?.isParking ? new Date(doc.data()?.startTime) : undefined
+        );
         setLotId(doc.data()?.lotId);
         setLicensePlate(doc.data()?.licensePlate);
         setIsAdmin(doc.data()?.isAdmin);
@@ -107,7 +110,9 @@ const AppProvider: FC = ({ children }) => {
     if (auth.currentUser) {
       unsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
         setIsParking(doc.data()?.isParking);
-        setStartTime(doc.data()?.startTime?.toDate());
+        setStartTime(
+          doc.data()?.isParking ? new Date(doc.data()?.startTime) : undefined
+        );
         setLotId(doc.data()?.lotId);
         setParkingHistory(doc.data()?.parkingHistory ?? []);
         setParkingHistory(doc.data()?.parkingHistory);
