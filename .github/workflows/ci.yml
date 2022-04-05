@@ -1,0 +1,23 @@
+#  CI workflow is triggered on pull requests on main branch
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+    # checkout repo on virtual machine
+    - name: Checkout
+      uses: actions/checkout@v2
+    # install dependencies
+    - uses: actions/setup-node@master
+    - uses: c-hive/gha-yarn-cache@v1
+
+    - name: Install node modules
+      working-directory: ./app
+      run: |
+        npm install
+
+    - name: Run test
+      working-directory: ./app
+      run: |
+        yarn test-ci
