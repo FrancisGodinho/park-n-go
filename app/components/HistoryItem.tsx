@@ -45,7 +45,9 @@ const HistoryItem = ({ item, id }: Props) => {
       );
     }
     if (item.duration && item.rate) {
-      setCost(((item.duration / 3600 / 100) * item.rate).toFixed(2).toString());
+      setCost(
+        ((item.duration / 3600 / 1000) * item.rate).toFixed(2).toString()
+      );
     }
   }, [item.start, item.duration, item.rate]);
 
@@ -78,9 +80,6 @@ const HistoryItem = ({ item, id }: Props) => {
         <View style={styles.rowStyle}>
           <Text style={{ color: Colors.primary, ...styles.fontStyle }}>
             ${cost}
-          </Text>
-          <Text style={{ color: Colors.darkWhite, ...styles.fontStyle }}>
-            {startTime} - {endTime}
           </Text>
         </View>
       </TouchableOpacity>
