@@ -27,4 +27,4 @@ jobs:
       - name: Run test
         working-directory: ./app
         run: |
-          npm run test
+          npm run test -- ./components/__tests__/CurrentScreen.test.js
