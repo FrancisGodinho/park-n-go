@@ -1,9 +1,9 @@
 #ifndef ACCEL_H
 #define ACCEL_H
 
-#include <iostream>
 #include <fstream>
-#include <string> 
+#include <iostream>
+#include <string>
 #include <vector>
 
 //#define DEBUG_PRINT
@@ -12,18 +12,19 @@
 using namespace std;
 
 // set constants
-const int img_height = 225;//TODO: Change these!
+const int img_height = 225; // TODO: Change these!
 const int img_width = 300;
 const int win_len = 5;
-const int real_image_height = 480;	
-const int real_image_width = 640;	
-const int pixels = 4;	
+const int real_image_height = 480;
+const int real_image_width = 640;
+const int pixels = 4;
 
-int setup_arr(vector<int>& a1, int* a2, char* o, int n);
-void g_blur(vector<vector<int>>& img, vector<vector<int>>& out, vector<int> win);
-int test ();
-int test2 ();
-int test3 ();
-int test4 ();
+int setup_arr(vector<int> &a1, int *a2, char *o, int n);
+void g_blur(vector<vector<int>> &img, vector<vector<int>> &out,
+            vector<int> win);
+int test();
+int test2();
+int test3();
+int test4();
 
 #endif // ACCEL_H
