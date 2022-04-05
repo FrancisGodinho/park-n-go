@@ -26,4 +26,4 @@ jobs:
       - name: Run test
         working-directory: ./app
         run: |
-          yarn test-ci
+          npm test
