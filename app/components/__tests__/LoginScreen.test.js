@@ -5,6 +5,14 @@ import { fireEvent, render } from "@testing-library/react";
 import { NavigationContainer } from "@react-navigation/native";
 import LoginScreen from "../../screens/LoginScreen";
 
+beforeAll((done) => {
+  done();
+});
+
+afterAll((done) => {
+  done();
+});
+
 let findTextElement = function (tree, element) {
   console.warn(tree);
   return true;

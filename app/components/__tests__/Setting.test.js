@@ -4,6 +4,14 @@ import { cleanup } from "@testing-library/react-native";
 import { fireEvent, render } from "@testing-library/react";
 import Settings from "../../screens/Settings";
 
+beforeAll((done) => {
+  done();
+});
+
+afterAll((done) => {
+  done();
+});
+
 let findTextElement = function (tree, element) {
   console.warn(tree);
   return true;
