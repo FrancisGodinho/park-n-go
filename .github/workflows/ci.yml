@@ -1,0 +1,10 @@
+#  CI workflow is triggered on pull requests on main branch
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+    # checkout repo on virtual machine
+    - name: Checkout
+      uses: actions/checkout@v2
