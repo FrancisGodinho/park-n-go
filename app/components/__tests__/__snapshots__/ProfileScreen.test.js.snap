@@ -1,0 +1,249 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ProfileScreen /> renders correctly 1`] = `
+<RCTSafeAreaView
+  accessible={false}
+  emulateUnlessSupported={true}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Object {
+      "flex": 1,
+      "marginHorizontal": 10,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "flex": 1,
+          "opacity": 1,
+        }
+      }
+    >
+      <Text />
+    </View>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#C0C0C0",
+            "fontFamily": "Avenir-Black",
+            "fontSize": 25,
+            "fontWeight": "900",
+            "textAlign": "center",
+          },
+          Object {
+            "maxWidth": "90%",
+          },
+        ]
+      }
+    >
+      undefined
+    </Text>
+    <View
+      style={
+        Object {
+          "flex": 1,
+        }
+      }
+    />
+  </View>
+  <View
+    onLayout={[Function]}
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#404040",
+        "borderRadius": 5,
+        "flexDirection": "row",
+        "marginVertical": 10,
+        "paddingVertical": 10,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "marginLeft": 10,
+          "width": 30,
+        }
+      }
+    >
+      <Text />
+    </View>
+    <TextInput
+      allowFontScaling={true}
+      autoCorrect={false}
+      editable={true}
+      enablesReturnKeyAutomatically={true}
+      keyboardType="default"
+      onChangeText={[Function]}
+      onSubmitEditing={[Function]}
+      placeholder="License Plate"
+      placeholderTextColor="#A0A0A0"
+      rejectResponderTermination={true}
+      returnKeyType="next"
+      style={
+        Array [
+          Object {
+            "color": "#C0C0C0",
+            "fontFamily": "Avenir-Black",
+            "fontSize": 17,
+            "fontWeight": "400",
+          },
+          Object {
+            "flex": 1,
+            "paddingHorizontal": 10,
+          },
+          undefined,
+        ]
+      }
+      underlineColorAndroid="transparent"
+      value=""
+    />
+  </View>
+  <View
+    onLayout={[Function]}
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#404040",
+        "borderRadius": 5,
+        "flexDirection": "row",
+        "marginVertical": 10,
+        "paddingVertical": 10,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "marginLeft": 10,
+          "width": 30,
+        }
+      }
+    >
+      <Text />
+    </View>
+    <TextInput
+      allowFontScaling={true}
+      autoCorrect={false}
+      editable={true}
+      enablesReturnKeyAutomatically={true}
+      keyboardType="default"
+      onChangeText={[Function]}
+      onSubmitEditing={[Function]}
+      placeholder="Credit Card"
+      placeholderTextColor="#A0A0A0"
+      rejectResponderTermination={true}
+      returnKeyType="next"
+      secureTextEntry={true}
+      style={
+        Array [
+          Object {
+            "color": "#C0C0C0",
+            "fontFamily": "Avenir-Black",
+            "fontSize": 17,
+            "fontWeight": "400",
+          },
+          Object {
+            "flex": 1,
+            "paddingHorizontal": 10,
+          },
+          undefined,
+        ]
+      }
+      underlineColorAndroid="transparent"
+      value=""
+    />
+    <View
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "marginRight": 10,
+          "opacity": 1,
+        }
+      }
+    >
+      <Text />
+    </View>
+  </View>
+  <View
+    accessible={true}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "backgroundColor": "#66A182",
+        "borderRadius": 5,
+        "marginBottom": 10,
+        "marginTop": "auto",
+        "opacity": 1,
+        "paddingVertical": 10,
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#C0C0C0",
+            "fontFamily": "Avenir-Black",
+            "fontSize": 17,
+            "fontWeight": "400",
+          },
+          Object {
+            "color": "#E0E0E0",
+            "textAlign": "center",
+          },
+          false,
+        ]
+      }
+    >
+      Sign Out
+    </Text>
+  </View>
+</RCTSafeAreaView>
+`;
