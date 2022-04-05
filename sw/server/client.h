@@ -9,10 +9,8 @@
 #include <stdint.h>
 
 #include "../accel/accel.h"
+#include "./utils.h"
 
 using namespace std;
-
-void form_reply(vector<vector<int>>& in, ofstream& f);
-void parse_response(string& in, vector<vector<int>>& res);
 
 #endif // CLIENT_H
