@@ -1,0 +1,21 @@
+#  CI workflow is triggered on pull requests on main branch
+name: Form reply tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Form Reply
+    runs-on: ubuntu-latest
+    steps:
+      # checkout repo on virtual machine
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run Tests
+        working-directory: ./sw/server
+        run: |
+          make form_reply && ./form_test
