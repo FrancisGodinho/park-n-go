@@ -6,6 +6,8 @@ kernel_accel:
 	cd ../accel && ../accel/register
 kernel_camera:
 	cd ../camera && ../camera/register
-test:
-	g++ client_tests.cpp -o tests -std=c++11
+parse_response:
+	g++ parse_response_test.cpp -o parse_test -std=c++11
+form_reply:
+	g++ form_reply_test.cpp -o form_test -std=c++11
 
