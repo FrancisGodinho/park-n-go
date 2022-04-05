@@ -130,7 +130,7 @@ const AdminHomeScreen = (props: Props) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={styles.pageContainer}>
+      <SafeAreaView testID="admin-safe-view" style={styles.pageContainer}>
         <Text style={[Headers.h1, styles.h1]}>{lotName}</Text>
         <View style={styles.pageContainer}>
           <View style={styles.itemContainer}>
