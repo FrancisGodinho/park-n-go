@@ -15,3 +15,5 @@ all:
 clean: 
 	make -C $(KDIR) M=$(SRC) ARCH=$(ARCH)  clean
 
+accel: 
+	g++ accel.cpp sw_test.cpp -o sw_test -std=c++11
