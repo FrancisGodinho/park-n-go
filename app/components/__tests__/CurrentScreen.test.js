@@ -17,7 +17,7 @@ let findTextElement = function (tree, element) {
 };
 
 describe("<CurrentScreen />", () => {
-  it("renders correctly", () => {
+  it.skip("renders correctly", () => {
     const tree = renderer.create(<CurrentScreen />).toJSON();
     expect(tree).toMatchSnapshot();
   });
