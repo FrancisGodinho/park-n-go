@@ -67,6 +67,11 @@ def string_to_numpy(str):
     return arr
 
 def alert_database(lpText):
+    print("In database alert")
+    print(lpText)
+    print(len(lpText))
+    lpText = lpText.strip()
+    print(len(lpText))
     userDocs = list(db.collection('users').where('licensePlate', '==', lpText).stream())
     if len(userDocs):
         id = userDocs[0].id
@@ -77,7 +82,7 @@ def alert_database(lpText):
             rate = db.collection('lots').document(userDoc['lotId']).get().to_dict()['rate']
             db.collection('users').document(id).update(
                 {'isParking': False, 'startTime': int(datetime.now().timestamp()*1000), 'lotId': '', 'parkingHistory': firestore.ArrayUnion(
-                    [{'startTime': userDoc['startTime'], 'endTime': int(datetime.now().timestamp()*1000), 'lotId': userDoc['lotId'], 'rate': rate}]
+                    [{'start': userDoc['startTime'], 'end': int(datetime.now().timestamp()*1000), 'lotId': userDoc['lotId'], 'rate': rate}]
                 )}
             )
         else:
@@ -107,7 +112,7 @@ async def create_upload_file(file: UploadFile = File(...)):
     raw_array = np.fromstring(content, dtype=np.uint8)
     raw_array = raw_array.reshape((480, 640, 4))
     image = raw_array[:, :, 0:3]
-    image += 10
+    #image += 10
     #print(image)
     imageio.imwrite("img.png", image)
     #return 0 #TODO: REMOVE
