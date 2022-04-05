@@ -5,7 +5,13 @@ import { fireEvent, render } from "@testing-library/react";
 
 import AdminHomeScreen from "../../screens/AdminHomeScreen";
 
-// afterEach(cleanup);
+beforeAll((done) => {
+  done();
+});
+
+afterAll((done) => {
+  done();
+});
 
 let findTextElement = function (tree, element) {
   console.warn(tree);
