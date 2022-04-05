@@ -40,6 +40,8 @@ const HistoryModal = ({
   const [lotCoords, setLotCoords] = useState({
     longitude: 0,
     latitude: 0,
+    longitudeDelta: 0,
+    latitudeDelta: 0,
   });
   const scaleValue = useRef(new Animated.Value(0)).current;
   const toggleModal = () => {
@@ -69,6 +71,8 @@ const HistoryModal = ({
         const coords = {
           longitude: lotSnap.data()?.longitude,
           latitude: lotSnap.data()?.latitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
         };
         setLotCoords(coords);
       })();
@@ -95,7 +99,11 @@ const HistoryModal = ({
             </TouchableOpacity>
           </View>
           <View style={styles.content}>
-            <MapView style={styles.map} showsUserLocation>
+            <MapView
+              style={styles.map}
+              showsUserLocation
+              initialRegion={lotCoords}
+            >
               <Marker
                 coordinate={lotCoords}
                 title={lotName}
@@ -138,7 +146,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 30,
     alignItems: "flex-end",
-    justifyContent: "center",
   },
   content: {
     justifyContent: "space-between",
