@@ -26,28 +26,34 @@ type Props = {};
 
 const ParkadeFinder = (props: Props) => {
   const [parkades, setParkades] = useState([]);
-  useEffect(async () => {
-    const lots = await getDocs(collection(db, "lots"));
-    const newParkades = [];
-    lots.forEach((doc) => {
-      const data = doc.data();
-      newParkades.push({
-        title: data.name,
-        coordinate: {
-          longitude: parseFloat(data.longitude),
-          latitude: parseFloat(data.latitude),
-        },
-        description:
-          "Rate is: $" +
-          data.rate +
-          " per hour, Capacity: " +
-          ((data.currentNumCars * 100) / data.capacity).toFixed(0).toString() +
-          "%",
-        rate: data.rate,
+
+  useEffect(() => {
+    (async () => {
+      const lots = await getDocs(collection(db, "lots"));
+      const newParkades = [];
+      lots.forEach((doc) => {
+        const data = doc.data();
+        newParkades.push({
+          title: data.name,
+          coordinate: {
+            longitude: parseFloat(data.longitude),
+            latitude: parseFloat(data.latitude),
+          },
+          description:
+            "Rate is: $" +
+            data.rate +
+            " per hour, Capacity: " +
+            ((data.currentNumCars * 100) / data.capacity)
+              .toFixed(0)
+              .toString() +
+            "%",
+          rate: data.rate,
+        });
       });
-    });
-    setParkades(newParkades);
+      setParkades(newParkades);
+    })();
   }, []);
+
   const COLORS = ["green", "yellow", "red"];
   return (
     <SafeAreaView>
