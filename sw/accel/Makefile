@@ -17,3 +17,6 @@ clean:
 
 accel: 
 	g++ accel.cpp sw_test.cpp -o sw_test -std=c++11
+
+clean:
+	rm -rf *.swp* *.o sw_test
