@@ -22,7 +22,7 @@ jobs:
       - name: Install node modules
         working-directory: ./app
         run: |
-          npm install --force
+          npm install
 
       - name: Run test
         working-directory: ./app
