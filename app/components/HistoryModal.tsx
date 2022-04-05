@@ -137,10 +137,13 @@ const styles = StyleSheet.create({
   },
   ModalContainer: {
     width: "80%",
-    backgroundColor: "white",
+    height: "60%",
+    backgroundColor: Colors.black,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.lightBlack,
   },
   header: {
     width: "100%",
@@ -158,7 +161,7 @@ const styles = StyleSheet.create({
   },
   map: {
     alignSelf: "stretch",
-    height: "75%",
+    height: "65%",
     borderRadius: 20,
   },
 });

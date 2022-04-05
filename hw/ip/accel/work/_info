@@ -1,0 +1,58 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/Users/franc/OneDrive/Desktop/tmp-CPEN391/uvispace-camera-fpga/de1-soc
+vaccel
+Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
+Z1 !s110 1647547615
+!i10b 1
+!s100 CL;[j7F<Q?34]@T;Z`EP80
+ID1UQoen^9ZIdb_fa9F;fc1
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+!s105 accel_sv_unit
+S1
+Z3 dC:/Users/franc/OneDrive/Desktop/tmp-CPEN391/uvispace-camera-fpga/ip/accel
+w1647547610
+8C:/Users/franc/OneDrive/Desktop/tmp-CPEN391/uvispace-camera-fpga/ip/accel/accel.sv
+FC:/Users/franc/OneDrive/Desktop/tmp-CPEN391/uvispace-camera-fpga/ip/accel/accel.sv
+L0 11
+Z4 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z5 !s108 1647547615.000000
+!s107 C:/Users/franc/OneDrive/Desktop/tmp-CPEN391/uvispace-camera-fpga/ip/accel/accel.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/franc/OneDrive/Desktop/tmp-CPEN391/uvispace-camera-fpga/ip/accel/accel.sv|
+!i113 1
+Z6 o-work work -sv
+Z7 tCvgOpt 0
+vtb_rtl_ksa
+R0
+R1
+!i10b 1
+!s100 ]`28ERo@bH0o3B?E?m_Pz0
+I0:9^]inFg=`k]^Z5:P@P93
+R2
+!s105 tb_accel_sv_unit
+S1
+R3
+w1647547325
+8C:/Users/franc/OneDrive/Desktop/tmp-CPEN391/uvispace-camera-fpga/ip/accel/tb_accel.sv
+FC:/Users/franc/OneDrive/Desktop/tmp-CPEN391/uvispace-camera-fpga/ip/accel/tb_accel.sv
+L0 2
+R4
+r1
+!s85 0
+31
+R5
+!s107 C:/Users/franc/OneDrive/Desktop/tmp-CPEN391/uvispace-camera-fpga/ip/accel/tb_accel.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/franc/OneDrive/Desktop/tmp-CPEN391/uvispace-camera-fpga/ip/accel/tb_accel.sv|
+!i113 1
+R6
+R7

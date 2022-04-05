@@ -1,0 +1,113 @@
+Info: Starting: Create HDL design files for synthesis
+Info: qsys-generate C:\Users\franc\OneDrive\Desktop\l2a-01-devicedrivers\hw\top\soc_system.qsys --synthesis=VERILOG --output-directory=C:\Users\franc\OneDrive\Desktop\l2a-01-devicedrivers\hw\top\soc_system\synthesis --family="Cyclone V" --part=5CSEMA5F31C6
+Progress: Loading top/soc_system.qsys
+Progress: Reading input file
+Progress: Adding accel_0 [accel 1.0]
+Progress: Parameterizing module accel_0
+Progress: Adding avalon_camera_0 [avalon_camera 1.0]
+Progress: Parameterizing module avalon_camera_0
+Progress: Adding avalon_img_writer_rgbgray [avalon_image_writer 1.0]
+Progress: Parameterizing module avalon_img_writer_rgbgray
+Progress: Adding ccd_pixel_clock_bridge [altera_clock_bridge 18.1]
+Progress: Parameterizing module ccd_pixel_clock_bridge
+Progress: Adding export_hps_reset_bridge [altera_reset_bridge 18.1]
+Progress: Parameterizing module export_hps_reset_bridge
+Progress: Adding external_clock_50_bridge [altera_clock_bridge 18.1]
+Progress: Parameterizing module external_clock_50_bridge
+Progress: Adding hps_0 [altera_hps 18.1]
+Progress: Parameterizing module hps_0
+Progress: Adding pll_camera_clks [altera_pll 18.1]
+Progress: Parameterizing module pll_camera_clks
+Progress: Adding pll_vga_clks [altera_pll 18.1]
+Progress: Parameterizing module pll_vga_clks
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: soc_system.hps_0: HPS Main PLL counter settings: n = 0  m = 73
+Info: soc_system.hps_0: HPS peripherial PLL counter settings: n = 0  m = 39
+Warning: soc_system.hps_0: "Configuration/HPS-to-FPGA user 0 clock frequency" (desired_cfg_clk_mhz) requested 100.0 MHz, but only achieved 97.368421 MHz
+Warning: soc_system.hps_0: 1 or more output clock frequencies cannot be achieved precisely, consider revising desired output clock frequencies.
+Info: soc_system.pll_camera_clks: The legal reference clock frequency is 5.0 MHz..800.0 MHz
+Info: soc_system.pll_camera_clks: Able to implement PLL with user settings
+Info: soc_system.pll_vga_clks: The legal reference clock frequency is 5.0 MHz..800.0 MHz
+Warning: soc_system.pll_vga_clks: Able to implement PLL - Actual settings differ from Requested settings
+Warning: soc_system.hps_0: hps_0.f2h_sdram0_data must be connected to an Avalon-MM master
+Info: soc_system: Generating soc_system "soc_system" for QUARTUS_SYNTH
+Info: Interconnect is inserted between master accel_0.avalon_master and slave hps_0.f2h_axi_slave because the master is of type avalon and the slave is of type axi.
+Info: Interconnect is inserted between master avalon_img_writer_rgbgray.avalon_master and slave hps_0.f2h_sdram1_data because the master has address signal 32 bit wide, but the slave is 28 bit wide.
+Info: Interconnect is inserted between master avalon_img_writer_rgbgray.avalon_master and slave hps_0.f2h_sdram1_data because the master has burstcount signal 7 bit wide, but the slave is 8 bit wide.
+Warning: hps_0.f2h_irq0: Cannot connect clock for irq_mapper.sender
+Warning: hps_0.f2h_irq0: Cannot connect reset for irq_mapper.sender
+Warning: hps_0.f2h_irq1: Cannot connect clock for irq_mapper_001.sender
+Warning: hps_0.f2h_irq1: Cannot connect reset for irq_mapper_001.sender
+Info: accel_0: "soc_system" instantiated accel "accel_0"
+Info: avalon_camera_0: "soc_system" instantiated avalon_camera "avalon_camera_0"
+Info: avalon_img_writer_rgbgray: "soc_system" instantiated avalon_image_writer "avalon_img_writer_rgbgray"
+Info: hps_0: "Running  for module: hps_0"
+Info: hps_0: HPS Main PLL counter settings: n = 0  m = 73
+Info: hps_0: HPS peripherial PLL counter settings: n = 0  m = 39
+Warning: hps_0: "Configuration/HPS-to-FPGA user 0 clock frequency" (desired_cfg_clk_mhz) requested 100.0 MHz, but only achieved 97.368421 MHz
+Warning: hps_0: 1 or more output clock frequencies cannot be achieved precisely, consider revising desired output clock frequencies.
+Info: hps_0: "soc_system" instantiated altera_hps "hps_0"
+Info: pll_camera_clks: "soc_system" instantiated altera_pll "pll_camera_clks"
+Info: pll_vga_clks: "soc_system" instantiated altera_pll "pll_vga_clks"
+Info: mm_interconnect_0: "soc_system" instantiated altera_mm_interconnect "mm_interconnect_0"
+Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
+Info: mm_interconnect_1: "soc_system" instantiated altera_mm_interconnect "mm_interconnect_1"
+Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_002: Inserting error_adapter: error_adapter_0
+Info: mm_interconnect_2: "soc_system" instantiated altera_mm_interconnect "mm_interconnect_2"
+Info: irq_mapper: "soc_system" instantiated altera_irq_mapper "irq_mapper"
+Info: rst_controller: "soc_system" instantiated altera_reset_controller "rst_controller"
+Info: fpga_interfaces: "hps_0" instantiated altera_interface_generator "fpga_interfaces"
+Info: hps_io: "hps_0" instantiated altera_hps_io "hps_io"
+Info: accel_0_avalon_master_translator: "mm_interconnect_0" instantiated altera_merlin_master_translator "accel_0_avalon_master_translator"
+Info: accel_0_avalon_master_agent: "mm_interconnect_0" instantiated altera_merlin_master_agent "accel_0_avalon_master_agent"
+Info: hps_0_f2h_axi_slave_agent: "mm_interconnect_0" instantiated altera_merlin_axi_slave_ni "hps_0_f2h_axi_slave_agent"
+Info: router: "mm_interconnect_0" instantiated altera_merlin_router "router"
+Info: router_001: "mm_interconnect_0" instantiated altera_merlin_router "router_001"
+Info: cmd_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info: cmd_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux"
+Info: rsp_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux"
+Info: rsp_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: hps_0_f2h_axi_slave_wr_cmd_width_adapter: "mm_interconnect_0" instantiated altera_merlin_width_adapter "hps_0_f2h_axi_slave_wr_cmd_width_adapter"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_merlin_address_alignment.sv
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_merlin_burst_uncompressor.sv
+Info: hps_0_f2h_sdram1_data_translator: "mm_interconnect_1" instantiated altera_merlin_slave_translator "hps_0_f2h_sdram1_data_translator"
+Info: hps_0_f2h_sdram1_data_agent: "mm_interconnect_1" instantiated altera_merlin_slave_agent "hps_0_f2h_sdram1_data_agent"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_merlin_burst_uncompressor.sv
+Info: hps_0_f2h_sdram1_data_agent_rsp_fifo: "mm_interconnect_1" instantiated altera_avalon_sc_fifo "hps_0_f2h_sdram1_data_agent_rsp_fifo"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_avalon_sc_fifo.v
+Info: router: "mm_interconnect_1" instantiated altera_merlin_router "router"
+Info: router_001: "mm_interconnect_1" instantiated altera_merlin_router "router_001"
+Info: cmd_demux: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info: cmd_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "cmd_mux"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: rsp_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "rsp_mux"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: avalon_st_adapter: "mm_interconnect_1" instantiated altera_avalon_st_adapter "avalon_st_adapter"
+Info: hps_0_h2f_axi_master_agent: "mm_interconnect_2" instantiated altera_merlin_axi_master_ni "hps_0_h2f_axi_master_agent"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_merlin_address_alignment.sv
+Info: router: "mm_interconnect_2" instantiated altera_merlin_router "router"
+Info: router_002: "mm_interconnect_2" instantiated altera_merlin_router "router_002"
+Info: hps_0_h2f_axi_master_wr_limiter: "mm_interconnect_2" instantiated altera_merlin_traffic_limiter "hps_0_h2f_axi_master_wr_limiter"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_avalon_sc_fifo.v
+Info: avalon_img_writer_rgbgray_avalon_slave_burst_adapter: "mm_interconnect_2" instantiated altera_merlin_burst_adapter "avalon_img_writer_rgbgray_avalon_slave_burst_adapter"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_merlin_address_alignment.sv
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_avalon_st_pipeline_base.v
+Info: cmd_demux: "mm_interconnect_2" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info: cmd_mux: "mm_interconnect_2" instantiated altera_merlin_multiplexer "cmd_mux"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: rsp_demux: "mm_interconnect_2" instantiated altera_merlin_demultiplexer "rsp_demux"
+Info: rsp_mux: "mm_interconnect_2" instantiated altera_merlin_multiplexer "rsp_mux"
+Info: Reusing file C:/Users/franc/OneDrive/Desktop/l2a-01-devicedrivers/hw/top/soc_system/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: avalon_st_adapter: "mm_interconnect_2" instantiated altera_avalon_st_adapter "avalon_st_adapter"
+Info: border: "hps_io" instantiated altera_interface_generator "border"
+Info: error_adapter_0: "avalon_st_adapter" instantiated error_adapter "error_adapter_0"
+Info: error_adapter_0: "avalon_st_adapter" instantiated error_adapter "error_adapter_0"
+Info: soc_system: Done "soc_system" with 46 modules, 106 files
+Info: qsys-generate succeeded.
+Info: Finished: Create HDL design files for synthesis

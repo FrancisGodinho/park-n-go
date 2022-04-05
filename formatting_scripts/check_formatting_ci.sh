@@ -1,6 +1,6 @@
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-$CURR_DIR/fix_formatting.sh
+$CURR_DIR/formatting_scripts/fix_formatting.sh
 if [[ "$?" != 0 ]]; then
     echo "FAILED, there is an error formatting files. Stopping script."
     exit 1
