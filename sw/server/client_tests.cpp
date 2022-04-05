@@ -79,11 +79,14 @@ int main(){
         cout << "Parse Reponse Tests Failed!" << endl;
         return 1;
     }
+    cout << endl;
     cout << "----- Running Form Reply Tests -----" << endl;
     if(form_reply_tests()){
         cout << "Form Reply Tests Failed!" << endl;
         return 1;
     }
-    cout << "All Tests Passed!" << endl;
+
+    cout << endl;
+    cout << "\033[0;32mFinished all Tests!\033[0m" << endl;
     return 0;
 }
