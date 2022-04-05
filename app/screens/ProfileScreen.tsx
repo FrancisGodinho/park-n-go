@@ -68,7 +68,7 @@ const ProfileScreen = (props: Props) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} testID="screen-view">
         <CustomHeader backDisabled={true} text={userEmail} />
         <CustomTextInput
           formik={formik}

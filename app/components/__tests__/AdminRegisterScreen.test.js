@@ -1,7 +1,6 @@
 import React from "react";
 import renderer from "react-test-renderer";
-import { cleanup } from "@testing-library/react-native";
-import { fireEvent, render } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import AdminRegisterScreen from "../../screens/AdminRegisterScreen";
 
@@ -28,5 +27,15 @@ describe("<AdminRegisterScreen />", () => {
       )
       .toJSON();
     expect(tree).toMatchSnapshot();
+  });
+
+  it("title text element exists", () => {
+    const { getByText } = render(
+      <NavigationContainer>
+        <AdminRegisterScreen />
+      </NavigationContainer>
+    );
+    const text = getByText("Create Admin Account");
+    expect(text).toBeTruthy();
   });
 });

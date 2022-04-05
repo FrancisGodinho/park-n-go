@@ -1,7 +1,6 @@
 import React from "react";
 import renderer from "react-test-renderer";
-import { cleanup } from "@testing-library/react-native";
-import { fireEvent, render } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react-native";
 import CurrentScreen from "../../screens/CurrentScreen";
 
 beforeAll((done) => {
@@ -19,7 +18,13 @@ let findTextElement = function (tree, element) {
 
 describe("<CurrentScreen />", () => {
   it("renders correctly", () => {
-    //   const tree = renderer.create(<CurrentScreen />).toJSON();
-    //   expect(tree).toMatchSnapshot();
+    const tree = renderer.create(<CurrentScreen />).toJSON();
+    expect(tree).toMatchSnapshot();
+  });
+
+  it.skip("screen view exists", () => {
+    const { getByTestId } = render(<CurrentScreen />);
+    const item = getByTestId("screen-view");
+    expect(item).toBeTruthy();
   });
 });

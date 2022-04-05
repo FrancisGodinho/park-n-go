@@ -1,7 +1,7 @@
 import React from "react";
 import renderer from "react-test-renderer";
-import { cleanup } from "@testing-library/react-native";
-import { fireEvent, render } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react-native";
+import { fireEvent } from "@testing-library/react";
 import { NavigationContainer } from "@react-navigation/native";
 import UserRegisterScreen from "../../screens/UserRegisterScreen";
 
@@ -28,5 +28,15 @@ describe("<UserRegisterScreen />", () => {
       )
       .toJSON();
     expect(tree).toMatchSnapshot();
+  });
+
+  it("title text element exists", () => {
+    const { getByText } = render(
+      <NavigationContainer>
+        <UserRegisterScreen />
+      </NavigationContainer>
+    );
+    const text = getByText("Create Account");
+    expect(text).toBeTruthy();
   });
 });

@@ -135,7 +135,9 @@ const AdminHomeScreen = (props: Props) => {
         <View style={styles.pageContainer}>
           <View style={styles.itemContainer}>
             <View style={styles.itemTextContainer}>
-              <Text style={styles.itemText}>{"Rate: "}</Text>
+              <Text style={styles.itemText} testID="rate-text">
+                {"Rate: "}
+              </Text>
               <Text style={[Headers.h2, styles.itemTextBody]}>
                 ${lotRate}/hr
               </Text>
@@ -153,7 +155,9 @@ const AdminHomeScreen = (props: Props) => {
           </View>
           <View style={styles.itemContainer}>
             <View style={styles.itemTextContainer}>
-              <Text style={styles.itemText}>{"Capacity: "}</Text>
+              <Text style={styles.itemText} testID="capacity-text">
+                {"Capacity: "}
+              </Text>
               <Text style={[Headers.h2, styles.itemTextBody]}>
                 {curNumCars}/{lotCapacity}
               </Text>
@@ -171,7 +175,9 @@ const AdminHomeScreen = (props: Props) => {
           </View>
           <View style={styles.itemContainer}>
             <View style={styles.itemTextContainer}>
-              <Text style={styles.itemText}>{"Longitude: "}</Text>
+              <Text style={styles.itemText} testID="longitude-text">
+                {"Longitude: "}
+              </Text>
               <Text style={[Headers.h2, styles.itemTextBody]}>
                 {lotLongitude}
               </Text>
@@ -189,7 +195,9 @@ const AdminHomeScreen = (props: Props) => {
           </View>
           <View style={{ marginBottom: 10, ...styles.itemContainer }}>
             <View style={styles.itemTextContainer}>
-              <Text style={styles.itemText}>{"Latitude: "}</Text>
+              <Text style={styles.itemText} testID="latitude-text">
+                {"Latitude: "}
+              </Text>
               <Text style={[Headers.h2, styles.itemTextBody]}>
                 {lotLatitude}
               </Text>
