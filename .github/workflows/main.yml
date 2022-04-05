@@ -1,0 +1,62 @@
+#  CI workflow is triggered on pull requests on main branch
+name: Park N Go
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  parse_reponse:
+    name: Parse Response
+    runs-on: ubuntu-latest
+    steps:
+      # checkout repo on virtual machine
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run Tests
+        working-directory: ./sw/server
+        run: |
+          make parse_response && ./parse_test
+  form_reply:
+    name: Form Reply
+    runs-on: ubuntu-latest
+    steps:
+      # checkout repo on virtual machine
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run Tests
+        working-directory: ./sw/server
+        run: |
+          make form_reply && ./form_test
+  server_dot_product:
+    name: Server Dot Product Tests
+    runs-on: ubuntu-latest
+    steps:
+      # checkout repo on virtual machine
+      - name: Checkout
+        uses: actions/checkout@v2
+      # run the sw server tests
+      - name: Run Tests
+        working-directory: ./api
+        run: |
+          python3 test.py
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-20.04
+    steps:
+      # checkout repo on virtual machine
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Environment Setup
+        working-directory: ./
+        run: |
+          sh ./formatting_scripts/environment_setup.sh
+
+      - name: Check Formatting
+        working-directory: ./
+        run: |
+          sh ./formatting_scripts/check_formatting_ci.sh
