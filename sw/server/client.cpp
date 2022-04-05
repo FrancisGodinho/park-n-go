@@ -1,15 +1,6 @@
-#include <iostream>
-#include <stdlib.h> 
-#include <stdio.h> 
-#include <fstream>
-#include <string> 
-#include <stdint.h>
+#include "./client.h"
 
-#include "../accel/accel.h"
-#include "./exec.h"
-
-
-static void parse_response(string& in, vector<vector<int>>& res){
+void parse_response(string& in, vector<vector<int>>& res){
 	vector<int> curr;
 	int curr_digit = 0;
 	for(int i = 0; i < in.size(); i++){
@@ -32,7 +23,7 @@ static void parse_response(string& in, vector<vector<int>>& res){
 	}
 }
 
-static void form_reply(vector<vector<int>>& in, ofstream& f){
+void form_reply(vector<vector<int>>& in, ofstream& f){
 	f << ("[");
 	for(int i = 0; i < in.size(); i++){
 		string curr = "[";
