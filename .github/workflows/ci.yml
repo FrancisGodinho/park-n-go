@@ -5,19 +5,25 @@ on:
   pull_request:
     branches:
       - main
-    # checkout repo on virtual machine
-    - name: Checkout
-      uses: actions/checkout@v2
-    # install dependencies
-    - uses: actions/setup-node@master
-    - uses: c-hive/gha-yarn-cache@v1
 
-    - name: Install node modules
-      working-directory: ./app
-      run: |
-        npm install
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      # checkout repo on virtual machine
+      - name: Checkout
+        uses: actions/checkout@v2
+      # install dependencies
+      - uses: actions/setup-node@master
+      - uses: c-hive/gha-yarn-cache@v1
 
-    - name: Run test
-      working-directory: ./app
-      run: |
-        yarn test-ci
+      - name: Install node modules
+        working-directory: ./app
+        run: |
+          npm install
+
+      - name: Run test
+        working-directory: ./app
+        run: |
+          npm test
