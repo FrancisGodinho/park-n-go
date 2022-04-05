@@ -57,7 +57,12 @@ const HistoryItem = ({ item, id }: Props) => {
       }}
     >
       <HistoryModal
-        historyId={id}
+        lotId={item.lotId}
+        lotName={lotName}
+        startTime={startTime}
+        endTime={endTime}
+        date={date}
+        cost={cost}
         isVisible={visible}
         onClose={() => setVisible(false)}
       />
@@ -72,10 +77,10 @@ const HistoryItem = ({ item, id }: Props) => {
         </View>
         <View style={styles.rowStyle}>
           <Text style={{ color: Colors.primary, ...styles.fontStyle }}>
-            ${cost} {item.current ? " (Tentative)" : ""}
+            ${cost}
           </Text>
           <Text style={{ color: Colors.darkWhite, ...styles.fontStyle }}>
-            {startTime} - {item.current ? "Now" : endTime}
+            {startTime} - {endTime}
           </Text>
         </View>
       </TouchableOpacity>
