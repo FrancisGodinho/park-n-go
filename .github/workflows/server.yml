@@ -1,0 +1,21 @@
+#  CI workflow is triggered on pull requests on main branch
+name: Server Dot Product Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Server Dot Product Tests
+    runs-on: ubuntu-latest
+    steps:
+      # checkout repo on virtual machine
+      - name: Checkout
+        uses: actions/checkout@v2
+      # run the sw server tests
+      - name: Run Tests
+        working-directory: ./api
+        run: |
+          python3 test.py
