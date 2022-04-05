@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
+import * as Yup from "yup";
 import { auth, db } from "../utils/Firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import ParkingAPI from "../api/ParkingAPI";
@@ -18,8 +19,17 @@ import CustomButton from "../components/CustomButton";
 import CustomTextInput from "../components/CustomTextInput";
 import MapView, { Marker } from "react-native-maps";
 
-type Props = {};
 const LOT_ID = "jw7d1mNE2Cw1mTG0tzzH";
+type Props = {};
+
+// const lotSchema = Yup.object().shape({
+//   rate: Yup.number()
+//     .required()
+//     .test("something", "LOL", (value: number) => {
+//       console.log("value: " + value);
+//       return value > 0;
+//     }),
+// });
 
 const AdminHomeScreen = (props: Props) => {
   const [lotRate, setLotRate] = useState("");
@@ -27,8 +37,13 @@ const AdminHomeScreen = (props: Props) => {
   const [curNumCars, setCurNumCars] = useState(0);
   const [lotLongitude, setLotLongitude] = useState("");
   const [lotLatitude, setLotLatitude] = useState("");
+  const [lotCoordinate, setLotCoordinate] = useState({
+    coordinate: { longitude: 0, latitude: 0 },
+  });
+  const [lotDescription, setLotDescription] = useState("");
 
-  // Note that lotId is null because the admin is not associated with any parking lot
+  // Note that lotId is null because the admin was not associated with any parking lot during registration
+  // In reality an admin should contact us to set up the parkade for security reasons
   // Currently using a fixed LOT_ID for this admin
   const { lotName, lotId, setLotName } = useGlobalContext();
 
@@ -40,7 +55,7 @@ const AdminHomeScreen = (props: Props) => {
       latitude: lotLatitude,
     },
     enableReinitialize: true,
-    // validationSchema: ProfileSchema,
+    // validationSchema: lotSchema,
     onSubmit: (values) => {
       console.log(values);
     },
@@ -55,6 +70,13 @@ const AdminHomeScreen = (props: Props) => {
       setCurNumCars(lotSnap.data()?.currentNumCars);
       setLotLongitude(lotSnap.data()?.longitude);
       setLotLatitude(lotSnap.data()?.latitude);
+      setLotCoordinate({
+        coordinate: {
+          longitude: parseFloat(lotSnap.data()?.longitude),
+          latitude: parseFloat(lotSnap.data()?.latitude),
+        },
+      });
+      setLotDescription(`Rate: $${lotSnap.data()?.rate} per hour`);
     })();
   }, [LOT_ID]);
 
@@ -165,7 +187,7 @@ const AdminHomeScreen = (props: Props) => {
               }}
             />
           </View>
-          <View style={styles.itemContainer}>
+          <View style={{ marginBottom: 10, ...styles.itemContainer }}>
             <View style={styles.itemTextContainer}>
               <Text style={styles.itemText}>{"Latitude: "}</Text>
               <Text style={[Headers.h2, styles.itemTextBody]}>
@@ -184,7 +206,13 @@ const AdminHomeScreen = (props: Props) => {
               }}
             />
           </View>
-          {/* <MapView style={styles.mapView} showsUserLocation></MapView> */}
+          <MapView style={styles.mapView} showsUserLocation>
+            <Marker
+              coordinate={lotCoordinate.coordinate}
+              title={lotName}
+              description={lotDescription}
+            />
+          </MapView>
           <CustomButton disabled={false} text="Sign Out" onPress={signOut} />
         </View>
       </SafeAreaView>
@@ -207,7 +235,7 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 5,
   },
   itemTextContainer: {
     flexDirection: "row",
@@ -221,12 +249,12 @@ const styles = StyleSheet.create({
   itemTextBody: { color: Colors.primary },
   customInput: {
     maxWidth: "90%",
+    maxHeight: 15,
   },
   signOutButton: {
     maxWidth: "30%",
   },
   mapView: {
-    alignSelf: "stretch",
-    height: "100%",
+    height: "40%",
   },
 });
