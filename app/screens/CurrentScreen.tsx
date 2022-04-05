@@ -44,7 +44,7 @@ const CurrentScreen = (props: Props) => {
   }, [isParking, startTime]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} testID="screen-view">
       {!isParking ? (
         <ParkadeFinder />
       ) : (

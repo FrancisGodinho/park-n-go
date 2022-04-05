@@ -1,7 +1,7 @@
 import React from "react";
+import "@testing-library/jest-dom";
 import renderer from "react-test-renderer";
-import { cleanup } from "@testing-library/react-native";
-import { fireEvent, render } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react-native";
 import Settings from "../../screens/Settings";
 
 beforeAll((done) => {
@@ -21,5 +21,11 @@ describe("<Settings />", () => {
   it("renders correctly", () => {
     const tree = renderer.create(<Settings />).toJSON();
     expect(tree).toMatchSnapshot();
+  });
+
+  it("Settings text element exists", () => {
+    const { getByText } = render(<Settings />);
+    const text = getByText("Settings");
+    expect(text).toBeTruthy();
   });
 });

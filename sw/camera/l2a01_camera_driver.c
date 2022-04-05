@@ -46,71 +46,14 @@ static struct file_operations fops = {
     .release = camera_release,
 };
 
-// Sysfs variables
 static int image_height = DEFAULT_IMAGE_HEIGHT;
 static int image_width = DEFAULT_IMAGE_WIDTH;
 static int image_writer_mode = CONTINUOUS;
-
-static ssize_t image_height_show(struct kobject *kobj,
-                                 struct kobj_attribute *attr, char *buf) {
-  return sprintf(buf, "%d\n", image_height);
-}
-
-static ssize_t image_height_store(struct kobject *kobj,
-                                  struct kobj_attribute *attr, const char *buf,
-                                  size_t count) {
-  sscanf(buf, "%du", &image_height);
-  return count;
-}
-static ssize_t image_width_show(struct kobject *kobj,
-                                struct kobj_attribute *attr, char *buf) {
-  return sprintf(buf, "%d\n", image_width);
-}
-
-static ssize_t image_width_store(struct kobject *kobj,
-                                 struct kobj_attribute *attr, const char *buf,
-                                 size_t count) {
-  sscanf(buf, "%du", &image_width);
-  return count;
-}
-
-static ssize_t image_writer_mode_show(struct kobject *kobj,
-                                      struct kobj_attribute *attr, char *buf) {
-  return sprintf(buf, "%d\n", image_writer_mode);
-}
-
-static ssize_t image_writer_mode_store(struct kobject *kobj,
-                                       struct kobj_attribute *attr,
-                                       const char *buf, size_t count) {
-  sscanf(buf, "%du", &image_writer_mode);
-  return count;
-}
-
-static struct kobj_attribute image_height_attribute =
-    __ATTR(image_height, 0660, image_height_show, image_height_store);
-static struct kobj_attribute image_width_attribute =
-    __ATTR(image_width, 0660, image_width_show, image_width_store);
-static struct kobj_attribute image_writer_mode_attribute = __ATTR(
-    image_writer_mode, 0660, image_writer_mode_show, image_writer_mode_store);
-
-static struct attribute *l2a01_camera_attributes[] = {
-    &image_height_attribute.attr,
-    &image_width_attribute.attr,
-    &image_writer_mode_attribute.attr,
-    NULL,
-};
-
-static struct attribute_group attribute_group = {
-    .name = "attributes",
-    .attrs =
-        l2a01_camera_attributes, ///< The attributes array defined just above
-};
 
 static struct kobject *l2a01_camera_kobj;
 
 //------INIT AND EXIT FUNCTIONS-----//
 static int __init camera_driver_init(void) {
-  int result;
   void *SDRAMC_virtual_address;
 
   printk(KERN_INFO DRIVER_NAME ": Init\n");
@@ -134,17 +77,10 @@ static int __init camera_driver_init(void) {
     goto error_create_rgbg;
   }
 
-  // Export sysfs variables
   // kernel_kobj points to /sys/kernel
   l2a01_camera_kobj = kobject_create_and_add(DRIVER_NAME, kernel_kobj->parent);
   if (!l2a01_camera_kobj) {
     printk(KERN_INFO DRIVER_NAME ": Failed to create kobject mapping\n");
-    goto error_create_kobj;
-  }
-  // add the attributes to /sys/l2a01_camera/attributes
-  result = sysfs_create_group(l2a01_camera_kobj, &attribute_group);
-  if (result) {
-    printk(KERN_INFO DRIVER_NAME ": Failed to create sysfs group\n");
     goto error_create_kobj;
   }
 
@@ -186,15 +122,10 @@ int camera_get_image(int n, char *user_read_buffer, size_t len) {
   int last_buffer;
   void *address_virtual_buffer;
 
-  // In case the software applicattions ask for images faster than the hardware
-  // can provide block the execution here until a new image is available
   while (ioread32(image_writer + CAPTURE_IMAGE_COUNTER) == last_image_number) {
   };
 
   last_image_number = ioread32(image_writer + CAPTURE_IMAGE_COUNTER);
-
-  // printk(KERN_INFO DRIVER_NAME": Image number %d\n", (int)
-  // last_image_number);
 
   // Capture already started so just check where the last image was saved
   last_buffer = ioread32(image_writer + LAST_BUFFER_CAPTURED);
@@ -254,11 +185,6 @@ static int camera_open(struct inode *inodep, struct file *filep) {
   // Calculate required memory to store an Image
   image_memory_size = image_width * image_height * pixel_size;
 
-  // Allocate uncached buffers
-  // The dma_alloc_coherent() function allocates non-cached physically
-  // contiguous memory. Accesses to the memory by the CPU are the same
-  // as a cache miss when the cache is used. The CPU does not have to
-  // invalidate or flush the cache which can be time consuming.
   virtual_buff0 = dma_alloc_coherent(
       NULL, image_memory_size,
       &(physical_buff0), // address to use from image writer in fpga
@@ -283,29 +209,19 @@ static int camera_open(struct inode *inodep, struct file *filep) {
 
   iowrite32(image_writer_mode, image_writer + CAPTURE_MODE);
 
-  // Save physical addresses into the avalon_camera
   iowrite32(physical_buff0, image_writer + CAPTURE_BUFF0);
   iowrite32(physical_buff1, image_writer + CAPTURE_BUFF1);
 
-  // Choose buffer 0 to be used in SINGLE_SHOT
   iowrite32(0, image_writer + CAPTURE_BUFFER_SELECT);
 
-  // Choose to use 2 alternating buffers in CONTINUOUS mode
   iowrite32(1, image_writer + CONT_DOUBLE_BUFF);
 
-  // Set up downsampling as 1 to get the whole image
   iowrite32(1, image_writer + CAPTURE_DOWNSAMPLING);
 
-  // In continuous mode start the capture of images into buff0 and buff1
-
-  // Stop the capture (to ensure a known state)
   iowrite32(0, image_writer + START_CAPTURE);
 
-  // Wait until Standby signal is 1. Its the way to ensure that the component
-  // is not in reset or acquiring a signal.
   counter = 10000000;
   while ((!(ioread32(image_writer + CAPTURE_STANDBY))) && (counter > 0)) {
-    // Ugly way avoid software to get stuck
     counter--;
   }
   if (counter == 0) {
@@ -326,7 +242,6 @@ static ssize_t camera_read(struct file *filep, char *buffer, size_t len,
                            loff_t *offset) {
   int error;
 
-  // Findout which device is being open using the minor numbers
   int dev_number = iminor(filep->f_path.dentry->d_inode);
 
   if (is_open == 0) {
@@ -344,7 +259,6 @@ static ssize_t camera_read(struct file *filep, char *buffer, size_t len,
 
 static int camera_release(struct inode *inodep, struct file *filep) {
 
-  // Findout which device is being open using the minor numbers
   int dev_number = iminor(filep->f_path.dentry->d_inode);
 
   if (dev_number == MINOR_RGBG) {
