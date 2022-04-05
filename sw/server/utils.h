@@ -22,7 +22,7 @@ void parse_response(string& in, vector<vector<int>>& res){
 			curr_digit = 0;
 			continue;
 		}
-		else if(in[i] == ']' && curr.size() > 0) {
+		else if(in[i] == ']' && i != in.size()-1 ) {
 			curr.push_back(curr_digit);
 			curr_digit = 0;
 			res.push_back(curr);
