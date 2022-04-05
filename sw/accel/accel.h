@@ -22,5 +22,8 @@ const int pixels = 4;
 int setup_arr(vector<int>& a1, int* a2, char* o, int n);
 void g_blur(vector<vector<int>>& img, vector<vector<int>>& out, vector<int> win);
 int test ();
+int test2 ();
+int test3 ();
+int test4 ();
 
 #endif // ACCEL_H

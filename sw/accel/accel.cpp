@@ -138,7 +138,7 @@ int test3 () {
     return 0;
 }
 
-int test3 () {
+int test4 () {
 	/* Size 4x4 windows with all 255's */
 	fstream accel;
 
