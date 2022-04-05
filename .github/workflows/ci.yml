@@ -16,7 +16,6 @@ jobs:
         uses: actions/checkout@v2
       # install dependencies
       - uses: actions/setup-node@master
-      - uses: c-hive/gha-yarn-cache@v1
 
       - name: Install node modules
         working-directory: ./app
