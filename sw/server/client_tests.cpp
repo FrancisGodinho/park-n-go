@@ -3,7 +3,7 @@
 static int parse_response_tests(){
     return 0;
 }
-static int form_reply(){
+static int form_reply_tests(){
     return 0;
 }
 int main(){
