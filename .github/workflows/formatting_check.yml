@@ -1,5 +1,5 @@
 #  CI workflow is triggered on pull requests on main branch
-name: Parse response test
+name: Formatting check
 
 on:
   push:
@@ -18,9 +18,9 @@ jobs:
       - name: Environment Setup
         working-directory: ./
         run: |
-          sudo ./formatting_scripts/environment_setup.sh
+          sh ./formatting_scripts/environment_setup.sh
 
       - name: Check Formatting
         working-directory: ./
         run: |
-          sudo ./formatting_scripts/check_formatting_ci.sh
+          sh ./formatting_scripts/check_formatting_ci.sh
