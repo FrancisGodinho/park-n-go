@@ -13,7 +13,7 @@ int main(){
         cout << "Parse Reponse Tests Failed!" << endl;
         return 1;
     }
-    if(form_reply_test()){
+    if(form_reply_tests()){
         cout << "Form Reply Tests Failed!" << endl;
         return 1;
     }
