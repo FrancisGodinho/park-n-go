@@ -6,7 +6,7 @@ import {
   View,
   ScrollView,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Headers from "../constants/Headers";
 import { useGlobalContext } from "../utils/context";
 import HistoryItem from "./HistoryItem";
@@ -20,12 +20,18 @@ import {
 } from "firebase/firestore";
 import { db } from "../utils/Firebase";
 import MapView, { Marker } from "react-native-maps";
-import { map } from "@firebase/util";
+import * as Location from 'expo-location';
+import CustomButton from "./CustomButton";
 
 type Props = {};
 
 const ParkadeFinder = (props: Props) => {
+
+  const latDelta = 0.0922;
+  const longDelta = 0.0421;
+
   const [parkades, setParkades] = useState([]);
+  const [location, setLocation] = useState({});
 
   useEffect(() => {
     (async () => {
@@ -54,6 +60,22 @@ const ParkadeFinder = (props: Props) => {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+        enableHighAccuracy: true,
+        timeInterval: 5
+      });
+      setLocation(location);
+    })();
+  }, []);
+
   const COLORS = ["green", "yellow", "red"];
   return (
     <SafeAreaView>
@@ -61,8 +83,14 @@ const ParkadeFinder = (props: Props) => {
         Find a parkade!
       </Text>
       <MapView
-        style={{ alignSelf: "stretch", height: "100%" }}
+        style={{ alignSelf: "stretch", height: "100%", width: "100%" }}
         showsUserLocation
+        region={{
+          latitude: location?.coords?.latitude ?? 0,  
+          longitude: location?.coords?.longitude ?? 0,
+          latitudeDelta: latDelta,
+          longitudeDelta: longDelta,
+        }}
       >
         {parkades.map((parkade, idx) => {
           return (
