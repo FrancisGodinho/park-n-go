@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<HistoryScreen /> renders correctly 1`] = `
+<RCTSafeAreaView
+  emulateUnlessSupported={true}
+>
+  <Text
+    style={
+      Object {
+        "color": "#C0C0C0",
+        "fontFamily": "Avenir-Black",
+        "fontSize": 25,
+        "fontWeight": "900",
+        "marginBottom": 20,
+        "textAlign": "center",
+      }
+    }
+  >
+    Parking History
+  </Text>
+  <RCTScrollView>
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#C0C0C0",
+            "fontFamily": "Avenir-Black",
+            "fontSize": 20,
+            "fontWeight": "700",
+          }
+        }
+      >
+        No Parking History Yet...
+      </Text>
+    </View>
+  </RCTScrollView>
+</RCTSafeAreaView>
+`;

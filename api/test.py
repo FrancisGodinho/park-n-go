@@ -21,9 +21,28 @@ def software_dot_product(img, win=window):
 
     return out
 
-if __name__ == "__main__":
-    img = [[1, 2, 3, 4], [4, 5, 6, 4], [7, 8, 9, 4]]
-    win = [1, 1, 1, 1, 1, 1, 1, 1, 1]
-    print(software_dot_product(img, win))
+def lists_equal(l1, l2):
+    for i1, i2 in zip(l1, l2):
+        if not l1 == l2:
+            return False
+    return len(l1) == len(l2)
 
+def test1():
+    img = [[1, 4, 3, 4], [4, 0, 6, 4], [7, 8, 9, 0]]
+    win = [1, 1, 1, 1, 1, 1, 1, 1, 1]
+    res = software_dot_product(img, win)
+    return lists_equal(res, [[42, 38]])
+
+def test2():
+    img = [[5, 2, 3, 4], [4, 5, 6, 4], [7, 8, 9, 4]]
+    win = [1, 1, 1, 1, 1, 1, 1, 1, 1]
+    res = software_dot_product(img, win)
+    return lists_equal(res, [[49, 45]])
+
+def run_all():
+    assert(test1())
+    assert(test2())
+
+if __name__ == "__main__":
+    run_all()
 
