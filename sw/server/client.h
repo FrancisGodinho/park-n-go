@@ -1,12 +1,12 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include <iostream>
-#include <stdlib.h> 
-#include <stdio.h> 
 #include <fstream>
-#include <string> 
+#include <iostream>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
 
 #include "../accel/accel.h"
 #include "./utils.h"
