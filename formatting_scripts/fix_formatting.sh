@@ -1,3 +1,7 @@
+# REQUIRES: 
+# sudo apt install clang-format
+# sudo apt install libncurses5
+
 export CLANG_VERSION=10.0
 
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
