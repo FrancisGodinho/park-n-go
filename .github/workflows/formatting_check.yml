@@ -18,9 +18,9 @@ jobs:
       - name: Environment Setup
         working-directory: ./
         run: |
-          ./formatting_scripts/environment_setup.sh
+          sudo ./formatting_scripts/environment_setup.sh
 
       - name: Check Formatting
         working-directory: ./
         run: |
-          ./formatting_scripts/check_formatting_ci.sh
+          sudo ./formatting_scripts/check_formatting_ci.sh
