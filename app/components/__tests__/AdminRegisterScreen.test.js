@@ -5,6 +5,14 @@ import { fireEvent, render } from "@testing-library/react";
 import { NavigationContainer } from "@react-navigation/native";
 import AdminRegisterScreen from "../../screens/AdminRegisterScreen";
 
+beforeAll((done) => {
+  done();
+});
+
+afterAll((done) => {
+  done();
+});
+
 let findTextElement = function (tree, element) {
   console.warn(tree);
   return true;
