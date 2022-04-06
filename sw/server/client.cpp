@@ -66,7 +66,6 @@ int main(){
     	uint32_t image_size = real_image_height * real_image_width * pixels;
     	string result(image_size, '\0');
     	camera.read(&result[0], image_size);
-		//camera.close();
 		// create new file
 		ofstream myfile;
  		myfile.open ("image");
@@ -75,7 +74,6 @@ int main(){
 
 		// make curl request 
 		system("curl -L -F 'file=@image' http://ec2-3-85-235-244.compute-1.amazonaws.com:8080/uploadfile > result");	
-		//system("curl -L -F 'file=@image' http://206.12.14.54:8080/uploadfile > result");	
     	fstream response;
     	response.open("./result", ios::binary | ios::in | ios::out);
 		string line;
@@ -94,10 +92,7 @@ int main(){
  		repl.open ("reply");
 		form_reply(output, repl);
  		repl.close();
-		//system("curl -L -F 'file=@reply' http://206.12.14.54:8080/accel_result");	
 		system("curl -L -F 'file=@reply' http://ec2-3-85-235-244.compute-1.amazonaws.com:8080/accel_result");	
-
-		//breat;
 	}
 	
 	return 0;
