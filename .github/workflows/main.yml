@@ -7,27 +7,6 @@ on:
       - main
 
 jobs:
-  app:
-    name: Tests
-    runs-on: ubuntu-latest
-    steps:
-      # checkout repo on virtual machine
-      - name: Checkout
-        uses: actions/checkout@v2
-      # install dependencies
-      - uses: actions/setup-node@master
-        with:
-          node-version: 16.13.2
-
-      - name: Install node modules
-        working-directory: ./app
-        run: |
-          npm install
-
-      - name: Run test
-        working-directory: ./app
-        run: |
-          npm run test
   parse_reponse:
     name: Parse Response
     runs-on: ubuntu-latest
