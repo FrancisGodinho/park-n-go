@@ -6,6 +6,7 @@ import {
   View,
   Animated,
   Text,
+  TouchableWithoutFeedback,
 } from "react-native";
 import Colors from "../constants/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -81,47 +82,50 @@ const HistoryModal = ({
 
   return (
     <Modal transparent visible={showModal}>
-      <SafeAreaView style={styles.ModalBackground}>
-        <Animated.View
-          style={[
-            styles.ModalContainer,
-            { transform: [{ scale: scaleValue }] },
-          ]}
-        >
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => {
-                setShowModal(false);
-                onClose();
-              }}
-            >
-              <Feather name="x" solid size={30} color={Colors.lightGray} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.content}>
-            <MapView
-              style={styles.map}
-              showsUserLocation
-              initialRegion={lotCoords}
-            >
-              <Marker
-                coordinate={lotCoords}
-                title={lotName}
-                id={lotId}
-                description={"PARKADE"}
-              />
-            </MapView>
-            <View>
-              <Text style={styles.text}>{lotName}</Text>
-              <Text style={styles.text}>{date}</Text>
-              <Text style={styles.text}>
-                {startTime}-{endTime}
-              </Text>
-              <Text style={[Headers.h2, styles.text]}>${cost}</Text>
+      <TouchableWithoutFeedback style={{width: "100%", height: "100%"}} onPress={()=>{ setShowModal(false); onClose(); }}>
+        <SafeAreaView style={styles.ModalBackground}>
+          <Animated.View
+            style={[
+              styles.ModalContainer,
+              { transform: [{ scale: scaleValue }] },
+            ]}
+          >
+            <View style={styles.header}>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowModal(false);
+                  onClose();
+                }}
+              >
+                <Feather name="x" solid size={30} color={Colors.lightGray} />
+              </TouchableOpacity>
             </View>
-          </View>
-        </Animated.View>
-      </SafeAreaView>
+            <View style={styles.content}>
+              <MapView
+                style={styles.map}
+                showsUserLocation
+                initialRegion={lotCoords}
+              >
+                <Marker
+                  coordinate={lotCoords}
+                  title={lotName}
+                  id={lotId}
+                />
+              </MapView>
+              <View>
+                <Text style={{...styles.text, color: Colors.primary, fontSize: 22}}>{lotName}</Text>
+                <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                  <Text style={styles.text}>{date}</Text>
+                  <Text style={styles.text}>
+                    {startTime}{" - "}{endTime}
+                  </Text>
+                </View>
+                <Text style={[Headers.h2, styles.text]}>${cost}</Text>
+              </View>
+            </View>
+          </Animated.View>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
@@ -137,7 +141,7 @@ const styles = StyleSheet.create({
   },
   ModalContainer: {
     width: "80%",
-    height: "60%",
+    height: "50%",
     backgroundColor: Colors.black,
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -161,7 +165,7 @@ const styles = StyleSheet.create({
   },
   map: {
     alignSelf: "stretch",
-    height: "65%",
+    height: "68%",
     borderRadius: 20,
   },
 });

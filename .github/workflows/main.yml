@@ -1,5 +1,5 @@
 #  CI workflow is triggered on pull requests on main branch
-name: Park N Go
+name: Park'N Go
 
 on:
   push:
@@ -73,11 +73,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Environment Setup
-        working-directory: ./
+        working-directory: ./formatting_scripts
         run: |
-          sh ./formatting_scripts/environment_setup.sh
+          ./environment_setup.sh
 
       - name: Check Formatting
-        working-directory: ./
+        working-directory: ./formatting_scripts
         run: |
-          sh ./formatting_scripts/check_formatting_ci.sh
+          ./check_formatting_ci.sh
