@@ -1,0 +1,26 @@
+#  CI workflow is triggered on pull requests on main branch
+name: Parse response test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-20.04
+    steps:
+      # checkout repo on virtual machine
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Environment Setup
+        working-directory: ./
+        run: |
+          ./formatting_scripts/environment_setup.sh
+
+      - name: Check Formatting
+        working-directory: ./
+        run: |
+          ./formatting_scripts/check_formatting_ci.sh
