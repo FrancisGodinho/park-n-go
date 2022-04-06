@@ -94,3 +94,46 @@ int test () {
     return 0;
 }
 
+int test2 () {
+    	/* size 9 window test with 0's and 255 */
+	fstream accel;
+
+	// test blur
+	vector<vector<int>> img = {{5, 3, 2, 1}, {10, 6, 5, 4}, {15, 9, 8, 7}};
+	vector<int> window = {1, 2, 3, 4, 0, 0, 255, 128, 0}; // change win_len to 9 when running test
+	vector<vector<int>> out(img_height - win_len + 1, vector<int>(img_width - win_len + 1));
+	g_blur(img, out, window);
+
+#if defined(DEBUG_PRINT) || defined(PRINT_BLUR_RESULT)
+	int p, q;
+	cout << "Result of blur is " << endl;
+	for(p = 0; p < img_height - win_len + 1; p++){
+		for(q = 0; q < img_width - win_len + 1; q++)
+			cout << out[p][q] << ", ";
+		cout << endl;
+	}	
+#endif
+    return 0;
+}
+
+int test3 () {
+	/* Size 9 windows with all 0's */
+	fstream accel;
+
+	// test blur
+	vector<vector<int>> img = {{5, 3, 2, 1}, {10, 6, 5, 4}, {15, 9, 8, 7}};
+	vector<int> window = {0, 0, 0, 0, 0, 0, 0, 0, 0}; // change win_len to 9 when running test
+	vector<vector<int>> out(img_height - win_len + 1, vector<int>(img_width - win_len + 1));
+	g_blur(img, out, window);
+
+#if defined(DEBUG_PRINT) || defined(PRINT_BLUR_RESULT)
+	int p, q;
+	cout << "Result of blur is " << endl;
+	for(p = 0; p < img_height - win_len + 1; p++){
+		for(q = 0; q < img_width - win_len + 1; q++)
+			cout << out[p][q] << ", ";
+		cout << endl;
+	}	
+#endif
+    return 0;
+}
