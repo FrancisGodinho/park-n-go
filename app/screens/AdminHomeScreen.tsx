@@ -41,6 +41,8 @@ const AdminHomeScreen = (props: Props) => {
     coordinate: { longitude: 0, latitude: 0 },
   });
   const [lotDescription, setLotDescription] = useState("");
+  const latDelta = 0.0922;
+  const longDelta = 0.0421;
 
   // Note that lotId is null because the admin was not associated with any parking lot during registration
   // In reality an admin should contact us to set up the parkade for security reasons
@@ -214,7 +216,16 @@ const AdminHomeScreen = (props: Props) => {
               }}
             />
           </View>
-          <MapView style={styles.mapView} showsUserLocation>
+          <MapView
+            style={styles.mapView}
+            showsUserLocation
+            region={{
+              latitude: lotCoordinate?.coordinate?.latitude ?? 0,
+              longitude: lotCoordinate?.coordinate?.longitude ?? 0,
+              latitudeDelta: latDelta,
+              longitudeDelta: longDelta,
+            }}
+          >
             <Marker
               coordinate={lotCoordinate.coordinate}
               title={lotName}
