@@ -166,7 +166,7 @@ def main():
 def main_single():
     alpr = ALPR(debug=True)
     lpText = None
-    image = cv2.imread('images__/0.png')
+    image = cv2.imread('images__/1.png')
     image = imutils.resize(image, width=400)
     print(image.shape)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

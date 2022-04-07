@@ -8,9 +8,10 @@ import { AppProvider } from "./utils/context";
 export default function App() {
   const isLoadingComplete = useCachedResources();
 
-  LogBox.ignoreLogs([
-    "AsyncStorage has been extracted from react-native core and will be removed in a future release",
-  ]);
+  // LogBox.ignoreLogs([
+  //   "AsyncStorage has been extracted from react-native core and will be removed in a future release",
+  // ]);
+  LogBox.ignoreAllLogs();
 
   if (!isLoadingComplete) {
     return null;
