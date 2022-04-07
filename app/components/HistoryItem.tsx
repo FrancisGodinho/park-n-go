@@ -28,14 +28,9 @@ const HistoryItem = ({ item, id }: Props) => {
   }, [item.lotId]);
 
   useEffect(() => {
-    console.log("hello");
-    console.log(item.duration);
     if (item.start) {
       var d1 = new Date(parseInt(item.start));
       var d2 = new Date(parseInt(item.end));
-      //d1.setUTCSeconds(item.start?.seconds);
-      //d2.setUTCSeconds(item.start?.seconds + item.duration * 60);
-      console.log(d1);
       setDate(d1.toLocaleDateString());
       setStartTime(
         d1.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })

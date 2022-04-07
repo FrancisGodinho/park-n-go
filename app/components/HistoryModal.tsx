@@ -82,7 +82,13 @@ const HistoryModal = ({
 
   return (
     <Modal transparent visible={showModal}>
-      <TouchableWithoutFeedback style={{width: "100%", height: "100%"}} onPress={()=>{ setShowModal(false); onClose(); }}>
+      <TouchableWithoutFeedback
+        style={{ width: "100%", height: "100%" }}
+        onPress={() => {
+          setShowModal(false);
+          onClose();
+        }}
+      >
         <SafeAreaView style={styles.ModalBackground}>
           <Animated.View
             style={[
@@ -106,20 +112,24 @@ const HistoryModal = ({
                 showsUserLocation
                 initialRegion={lotCoords}
               >
-                <Marker
-                  coordinate={lotCoords}
-                  title={lotName}
-                  id={lotId}
-                />
+                <Marker coordinate={lotCoords} title={lotName} id={lotId} />
               </MapView>
               <View>
-                <Text style={{...styles.text, color: Colors.primary, fontSize: 22}}>{lotName}</Text>
-                <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-                  <Text style={styles.text}>{date}</Text>
-                  <Text style={styles.text}>
-                    {startTime}{" - "}{endTime}
-                  </Text>
-                </View>
+                <Text
+                  style={{
+                    ...styles.text,
+                    color: Colors.primary,
+                    fontSize: 22,
+                  }}
+                >
+                  {lotName}
+                </Text>
+                <Text style={styles.text}>{date}</Text>
+                <Text style={styles.text}>
+                  {startTime}
+                  {" - "}
+                  {endTime}
+                </Text>
                 <Text style={[Headers.h2, styles.text]}>${cost}</Text>
               </View>
             </View>
@@ -141,7 +151,7 @@ const styles = StyleSheet.create({
   },
   ModalContainer: {
     width: "80%",
-    height: "50%",
+    height: "57%",
     backgroundColor: Colors.black,
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -159,7 +169,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: "Avenir-Black",
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: "500",
     color: Colors.lightGray,
   },

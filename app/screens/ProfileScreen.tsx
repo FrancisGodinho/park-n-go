@@ -49,7 +49,6 @@ const ProfileScreen = (props: Props) => {
   });
 
   const signOut = () => {
-    console.log("User signout");
     auth.signOut();
   };
 
