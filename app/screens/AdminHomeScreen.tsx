@@ -22,15 +22,6 @@ import MapView, { Marker } from "react-native-maps";
 const LOT_ID = "jw7d1mNE2Cw1mTG0tzzH";
 type Props = {};
 
-// const lotSchema = Yup.object().shape({
-//   rate: Yup.number()
-//     .required()
-//     .test("something", "LOL", (value: number) => {
-//       console.log("value: " + value);
-//       return value > 0;
-//     }),
-// });
-
 const AdminHomeScreen = (props: Props) => {
   const [lotRate, setLotRate] = useState("");
   const [lotCapacity, setLotCapacity] = useState("");
