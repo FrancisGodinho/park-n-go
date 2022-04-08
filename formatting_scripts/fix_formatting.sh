@@ -11,7 +11,6 @@ CLANG_FORMAT_EXTENSIONS=(h cpp c hpp)
 
 function run_clang_format () {
     printf "Running clang-format over all files...\n\n"
-    cd $BAZEL_ROOT_DIR
 
     EXTENSION_STRING=""
     for value in "${CLANG_FORMAT_EXTENSIONS[@]}"
